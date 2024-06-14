@@ -11,6 +11,7 @@ public class ConfigaurationAnimal {
 
 
 
+
     @Value("${telegram.bot.token}")
     private String token;
 
