@@ -9,6 +9,7 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class ConfigaurationAnimal {
 
+
     @Value("7365332306:AAF3my2PNLsx2zSa9usGNUHftYZeTgjBKFQ")
     private String token;
 
