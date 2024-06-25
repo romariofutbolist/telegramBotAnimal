@@ -14,6 +14,7 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.meta.generics.TelegramBot;
 import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
 import skyPro.telegramBotAnimal.model.MenuBot;
+import skyPro.telegramBotAnimal.model.Volunteer;
 import skyPro.telegramBotAnimal.repository.NotificationTaskRepository;
 
 import java.util.List;
@@ -24,11 +25,13 @@ public class TelegramBotUpdatesListener extends TelegramLongPollingBot {
 
     private final NotificationTaskRepository repository;
     private final MenuBot menuBot;
+    private final Volunteer volunteer;
 
-    public TelegramBotUpdatesListener(NotificationTaskRepository repository, MenuBot menuBot) {
+    public TelegramBotUpdatesListener(NotificationTaskRepository repository, MenuBot menuBot, Volunteer volunteer) {
 
         this.repository = repository;
         this.menuBot = menuBot;
+        this.volunteer = volunteer;
     }
 
     @PostConstruct
@@ -63,6 +66,12 @@ public class TelegramBotUpdatesListener extends TelegramLongPollingBot {
                 } else if ("Как взять животное из приюта".equals(text)) {
                     //  "Кнопка 2"
                     execute(new SendMessage(chatId, "взять животное"));
+                } else if ("Прислать отчет о питомце".equals(text)) {
+                    // "Кнопка 3"
+                    execute(new SendMessage(chatId, "Питомец чувствует себя хорошо"));
+                } else if ("Вызвать волонтера".equals(text)) {
+                    // "Кнопка 4"
+                    execute(new SendMessage(chatId, "Зраствуйте меня зовут " + volunteer + " , чем могу помочь?"));
                 }
             }
         }
