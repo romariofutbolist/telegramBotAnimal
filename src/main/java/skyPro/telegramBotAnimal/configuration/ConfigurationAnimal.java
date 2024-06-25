@@ -10,4 +10,7 @@ public class ConfigurationAnimal {
     @Value("${telegram.bot.token}")
     private String token;
 
+    @Value("{telegram.bot.volunteer}")
+    private String volunteer;
+
 }

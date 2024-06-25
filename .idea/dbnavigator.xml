@@ -29,6 +29,9 @@
   <component name="DBNavigator.Project.DatabaseSessionManager">
     <connection id="25bd23e4-83d3-4f3d-a24a-08ebd483137d" />
   </component>
+  <component name="DBNavigator.Project.FileConnectionMappingManager">
+    <mapping file-url="file://$PROJECT_DIR$/src/main/resources/liquibase/scripts/script1.sql" connection-id="25bd23e4-83d3-4f3d-a24a-08ebd483137d" session-id="MAIN" current-schema="public" />
+  </component>
   <component name="DBNavigator.Project.ObjectQuickFilterManager">
     <last-used-operator value="EQUAL" />
     <filters />
@@ -41,7 +44,7 @@
           <description value="" />
           <database-type value="POSTGRES" />
           <config-type value="BASIC" />
-          <database-version value="9999.0" />
+          <database-version value="10.23" />
           <driver-source value="BUNDLED" />
           <driver-library value="" />
           <driver value="" />
@@ -52,8 +55,8 @@
           <tns-folder value="" />
           <tns-profile value="" />
           <type value="USER_PASSWORD" />
-          <user value="tg_animal" />
-          <deprecated-pwd value="" />
+          <user value="denis" />
+          <deprecated-pwd value="NTIyMTIz" />
         </database>
         <properties>
           <auto-commit value="false" />
