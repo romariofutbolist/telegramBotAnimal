@@ -30,7 +30,7 @@
     <connection id="25bd23e4-83d3-4f3d-a24a-08ebd483137d" />
   </component>
   <component name="DBNavigator.Project.FileConnectionMappingManager">
-    <mapping file-url="file://$PROJECT_DIR$/src/main/resources/liquibase/scripts/script1.sql" connection-id="25bd23e4-83d3-4f3d-a24a-08ebd483137d" session-id="MAIN" current-schema="public" />
+    <mapping file-url="file://$PROJECT_DIR$/src/main/resources/liquibase/scripts/script1.sql" connection-id="25bd23e4-83d3-4f3d-a24a-08ebd483137d" session-id="MAIN" current-schema="postgres" />
   </component>
   <component name="DBNavigator.Project.ObjectQuickFilterManager">
     <last-used-operator value="EQUAL" />
