@@ -24,6 +24,8 @@ public class MenuBot {
         KeyboardRow row1 = new KeyboardRow();
         row1.add("Информация о приюте");
         row1.add("Как взять животное из приюта");
+        row1.add("Прислать отчет о питомце");
+        row1.add("Позвать волонтера");
         keyboardRows.add(row1);
 
         keyboardMarkup.setKeyboard(keyboardRows);
