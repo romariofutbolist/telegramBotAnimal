@@ -11,12 +11,10 @@ import org.telegram.telegrambots.meta.TelegramBotsApi;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
-import org.telegram.telegrambots.meta.generics.TelegramBot;
 import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
 import skyPro.telegramBotAnimal.model.MenuBot;
 import skyPro.telegramBotAnimal.repository.NotificationTaskRepository;
 
-import java.util.List;
 
 @Service
 public class TelegramBotUpdatesListener extends TelegramLongPollingBot {
@@ -24,6 +22,7 @@ public class TelegramBotUpdatesListener extends TelegramLongPollingBot {
 
     private final NotificationTaskRepository repository;
     private final MenuBot menuBot;
+
 
     public TelegramBotUpdatesListener(NotificationTaskRepository repository, MenuBot menuBot) {
 
@@ -37,8 +36,6 @@ public class TelegramBotUpdatesListener extends TelegramLongPollingBot {
         TelegramBotsApi api = new TelegramBotsApi(DefaultBotSession.class);
         api.registerBot(this);
     }
-
-
     @Override
     public void onUpdateReceived(Update update) {
         try {
@@ -54,7 +51,7 @@ public class TelegramBotUpdatesListener extends TelegramLongPollingBot {
 
                 } else if ("/menu".equals(text)) {
 
-                    var sendMessage = new SendMessage(chatId, "1");
+                    var sendMessage = new SendMessage(chatId, "выберите услугу");
                     sendMessage.setReplyMarkup(menuBot.sendMainMenu());
                     execute(sendMessage);
                 } else if ("Информация о приюте".equals(text)) {
@@ -63,6 +60,12 @@ public class TelegramBotUpdatesListener extends TelegramLongPollingBot {
                 } else if ("Как взять животное из приюта".equals(text)) {
                     //  "Кнопка 2"
                     execute(new SendMessage(chatId, "взять животное"));
+                } else if ("Прислать отчет о питомце".equals(text)) {
+                    // "Кнопка 3"
+                    execute(new SendMessage(chatId, "Питомец чувствует себя хорошо"));
+                } else if ("Позвать волонтера".equals(text)) {
+                    // "Кнопка 4"
+                    execute(new SendMessage(chatId, "Зраствуйте меня зовут Иван, я волонтер приюта, чем могу помочь?"));
                 }
             }
         }
