@@ -36,39 +36,49 @@ public class TelegramBotUpdatesListener extends TelegramLongPollingBot {
         TelegramBotsApi api = new TelegramBotsApi(DefaultBotSession.class);
         api.registerBot(this);
     }
+
     @Override
     public void onUpdateReceived(Update update) {
         try {
-        logger.info("Processing update: {}", update);
-        var message = update.getMessage();
-        if (message != null) {
-            var text = update.getMessage().getText();
-            var chatId = update.getMessage().getChatId().toString();
-            if (text != null) {
-                if ("/start".equals(text)) {
+            logger.info("Processing update: {}", update);
+            var message = update.getMessage();
+            if (message != null) {
+                var text = update.getMessage().getText();
+                var chatId = update.getMessage().getChatId().toString();
 
+                if (text != null) {
+                    SendMessage sendMessage = null;
+                    if ("/start".equals(text)) {
+                        // Используем execute из TelegramLongPollingBot
                         execute(new SendMessage(chatId, "Hello!"));
 
-                } else if ("/menu".equals(text)) {
+                    } else if ("/menu".equals(text)) {
+                        sendMessage = new SendMessage(chatId, "выберите услугу");
+                        // Добавляем ReplyMarkup к SendMessage
+                        sendMessage.setReplyMarkup(menuBot.sendMainMenu());
+                        // Используем execute из TelegramLongPollingBot
+                        execute(sendMessage);
+                    } else if ("Информация о приюте".equals(text)) {
+                        // "Кнопка 1"
+                        // Создаем новый объект SendMessage здесь:
+                        sendMessage = new SendMessage(chatId, "Информация о приюте");
+                        sendMessage.setReplyMarkup(menuBot.sendSubmenu1());
+                        execute(sendMessage);
 
-                    var sendMessage = new SendMessage(chatId, "выберите услугу");
-                    sendMessage.setReplyMarkup(menuBot.sendMainMenu());
-                    execute(sendMessage);
-                } else if ("Информация о приюте".equals(text)) {
-                    // "Кнопка 1"
-                    execute(new SendMessage(chatId, "инфо"));
-                } else if ("Как взять животное из приюта".equals(text)) {
-                    //  "Кнопка 2"
-                    execute(new SendMessage(chatId, "взять животное"));
-                } else if ("Прислать отчет о питомце".equals(text)) {
-                    // "Кнопка 3"
-                    execute(new SendMessage(chatId, "Питомец чувствует себя хорошо"));
-                } else if ("Позвать волонтера".equals(text)) {
-                    // "Кнопка 4"
-                    execute(new SendMessage(chatId, "Зраствуйте меня зовут Иван, я волонтер приюта, чем могу помочь?"));
+
+
+                    } else if ("Как взять животное из приюта".equals(text)) {
+                        //  "Кнопка 2"
+                        execute(new SendMessage(chatId, "взять животное"));
+                    } else if ("Прислать отчет о питомце".equals(text)) {
+                        // "Кнопка 3"
+                        execute(new SendMessage(chatId, "Питомец чувствует себя хорошо"));
+                    } else if ("Позвать волонтера".equals(text)) {
+                        // "Кнопка 4"
+                        execute(new SendMessage(chatId, "Здравствуйте, меня зовут Иван, я волонтер приюта, чем могу помочь?"));
+                    }
                 }
             }
-        }
         } catch (TelegramApiException e) {
             throw new RuntimeException(e);
         }
@@ -86,21 +96,3 @@ public class TelegramBotUpdatesListener extends TelegramLongPollingBot {
 }
 
 
-//    @Override
-//    public void onUpdateReceived(org.telegram.telegrambots.meta.api.objects.Update update) {
-//        if (update.hasMessage() && update.getMessage().hasText()) {
-//            String messageText = update.getMessage().getText();
-//            long chatId = update.getMessage().getChatId();
-//
-//            // Обработка команд
-//            if (messageText.equals("/start")) {
-//                sendMainMenu(chatId);
-//            } else if (messageText.equals("Option 1")) {
-//                sendMessage(chatId, "You selected Option 1!");
-//            } else if (messageText.equals("Option 2")) {
-//                sendMessage(chatId, "You selected Option 2!");
-//            } else {
-//                sendMessage(chatId, "Invalid command.");
-//            }
-//        }
-//    }
