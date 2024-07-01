@@ -25,6 +25,7 @@ public class TelegramBotUpdatesListener extends TelegramLongPollingBot {
     private final NotificationTaskRepository repository;
     private final MenuBot menuBot;
 
+
     public TelegramBotUpdatesListener(NotificationTaskRepository repository, MenuBot menuBot) {
 
         this.repository = repository;
@@ -38,34 +39,48 @@ public class TelegramBotUpdatesListener extends TelegramLongPollingBot {
         api.registerBot(this);
     }
 
-
     @Override
     public void onUpdateReceived(Update update) {
         try {
-        logger.info("Processing update: {}", update);
-        var message = update.getMessage();
-        if (message != null) {
-            var text = update.getMessage().getText();
-            var chatId = update.getMessage().getChatId().toString();
-            if (text != null) {
-                if ("/start".equals(text)) {
+            logger.info("Processing update: {}", update);
+            var message = update.getMessage();
+            if (message != null) {
+                var text = update.getMessage().getText();
+                var chatId = update.getMessage().getChatId().toString();
 
+                if (text != null) {
+                    SendMessage sendMessage = null;
+                    if ("/start".equals(text)) {
+                        // Используем execute из TelegramLongPollingBot
                         execute(new SendMessage(chatId, "Hello!"));
 
-                } else if ("/menu".equals(text)) {
+                    } else if ("/menu".equals(text)) {
+                        sendMessage = new SendMessage(chatId, "выберите услугу");
+                        // Добавляем ReplyMarkup к SendMessage
+                        sendMessage.setReplyMarkup(menuBot.sendMainMenu());
+                        // Используем execute из TelegramLongPollingBot
+                        execute(sendMessage);
+                    } else if ("Информация о приюте".equals(text)) {
+                        // "Кнопка 1"
+                        // Создаем новый объект SendMessage здесь:
+                        sendMessage = new SendMessage(chatId, "Информация о приюте");
+                        sendMessage.setReplyMarkup(menuBot.sendSubmenu1());
+                        execute(sendMessage);
 
-                    var sendMessage = new SendMessage(chatId, "1");
-                    sendMessage.setReplyMarkup(menuBot.sendMainMenu());
-                    execute(sendMessage);
-                } else if ("Информация о приюте".equals(text)) {
-                    // "Кнопка 1"
-                    execute(new SendMessage(chatId, "инфо"));
-                } else if ("Как взять животное из приюта".equals(text)) {
-                    //  "Кнопка 2"
-                    execute(new SendMessage(chatId, "взять животное"));
+
+
+                    } else if ("Как взять животное из приюта".equals(text)) {
+                        //  "Кнопка 2"
+                        execute(new SendMessage(chatId, "взять животное"));
+                    } else if ("Прислать отчет о питомце".equals(text)) {
+                        // "Кнопка 3"
+                        execute(new SendMessage(chatId, "Питомец чувствует себя хорошо"));
+                    } else if ("Позвать волонтера".equals(text)) {
+                        // "Кнопка 4"
+                        execute(new SendMessage(chatId, "Здравствуйте, меня зовут Иван, я волонтер приюта, чем могу помочь?"));
+                    }
                 }
             }
-        }
         } catch (TelegramApiException e) {
             throw new RuntimeException(e);
         }
