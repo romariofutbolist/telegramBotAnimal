@@ -69,7 +69,12 @@ public class TelegramBotUpdatesListener extends TelegramLongPollingBot {
 
                     } else if ("Как взять животное из приюта".equals(text)) {
                         //  "Кнопка 2"
-                        execute(new SendMessage(chatId, "взять животное"));
+                        sendMessage = new SendMessage(chatId, "Как взять животное из приюта");
+                        sendMessage.setReplyMarkup(menuBot.sendSubmenu2());
+                        execute(sendMessage);
+
+
+
                     } else if ("Прислать отчет о питомце".equals(text)) {
                         // "Кнопка 3"
                         execute(new SendMessage(chatId, "Питомец чувствует себя хорошо"));
