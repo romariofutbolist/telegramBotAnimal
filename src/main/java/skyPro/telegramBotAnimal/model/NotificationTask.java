@@ -22,9 +22,6 @@ public class NotificationTask {
         this.date = date;
     }
 
-    public NotificationTask() {
-
-    }
 
     public Long getId() {
         return id;
