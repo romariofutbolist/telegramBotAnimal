@@ -50,6 +50,30 @@ public class MenuBot {
 
         submenuKeyboard.setKeyboard(submenuKeyboardRows);
         return submenuKeyboard;
+    }
+    public ReplyKeyboardMarkup sendSubmenu2() {
+        ReplyKeyboardMarkup submenuKeyboard2 = new ReplyKeyboardMarkup();
+        submenuKeyboard2.setSelective(true);
+        submenuKeyboard2.setResizeKeyboard(true);
+        List<KeyboardRow> submenuKeyboardRows = new ArrayList<>();
+
+        KeyboardRow row01 = new KeyboardRow();
+        row01.add("Список животных");
+        row01.add("Правила знакомства и усыновления");
+        row01.add("Список необходимых документов");
+        row01.add("Рекомендации");
+
+        KeyboardRow row02 = new KeyboardRow();
+        row02.add("Советы кинолога");
+        row02.add("Проверенные кинологи");
+        row02.add("Причины отказа");
+        row02.add("Запросить связь");
+        submenuKeyboardRows.add(row01);
+        submenuKeyboardRows.add(row02);
+
+        submenuKeyboard2.setKeyboard(submenuKeyboardRows);
+        return submenuKeyboard2;
+    }
 
 
 //
@@ -76,7 +100,7 @@ public class MenuBot {
 //        } catch (TelegramApiException e) {
 //            e.printStackTrace();
 //        }
-    }
+
 }
 
 
