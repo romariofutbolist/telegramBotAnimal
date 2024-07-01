@@ -74,7 +74,6 @@ public class TelegramBotUpdatesListener extends TelegramLongPollingBot {
                         execute(sendMessage);
 
 
-
                     } else if ("Прислать отчет о питомце".equals(text)) {
                         // "Кнопка 3"
                         execute(new SendMessage(chatId, "Питомец чувствует себя хорошо"));
