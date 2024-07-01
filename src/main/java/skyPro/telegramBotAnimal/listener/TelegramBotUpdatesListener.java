@@ -11,12 +11,10 @@ import org.telegram.telegrambots.meta.TelegramBotsApi;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
-import org.telegram.telegrambots.meta.generics.TelegramBot;
 import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
 import skyPro.telegramBotAnimal.model.MenuBot;
 import skyPro.telegramBotAnimal.repository.NotificationTaskRepository;
 
-import java.util.List;
 
 @Service
 public class TelegramBotUpdatesListener extends TelegramLongPollingBot {
@@ -71,7 +69,11 @@ public class TelegramBotUpdatesListener extends TelegramLongPollingBot {
 
                     } else if ("Как взять животное из приюта".equals(text)) {
                         //  "Кнопка 2"
-                        execute(new SendMessage(chatId, "взять животное"));
+                        sendMessage = new SendMessage(chatId, "Как взять животное из приюта");
+                        sendMessage.setReplyMarkup(menuBot.sendSubmenu2());
+                        execute(sendMessage);
+
+
                     } else if ("Прислать отчет о питомце".equals(text)) {
                         // "Кнопка 3"
                         execute(new SendMessage(chatId, "Питомец чувствует себя хорошо"));
