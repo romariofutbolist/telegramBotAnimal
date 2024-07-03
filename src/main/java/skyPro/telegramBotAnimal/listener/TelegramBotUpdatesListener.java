@@ -6,14 +6,19 @@ import javax.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.util.ResourceUtils;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.TelegramBotsApi;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
 import skyPro.telegramBotAnimal.model.MenuBot;
 import skyPro.telegramBotAnimal.repository.NotificationTaskRepository;
+
+import java.io.File;
+import java.io.FileNotFoundException;
 
 
 @Service
@@ -50,7 +55,10 @@ public class TelegramBotUpdatesListener extends TelegramLongPollingBot {
                     SendMessage sendMessage = null;
                     if ("/start".equals(text)) {
                         // Используем execute из TelegramLongPollingBot
-                        execute(new SendMessage(chatId, "Hello!"));
+                        execute(new SendMessage(chatId, "Привет! \uD83D\uDC4B Я бот, который поможет вам взаимодействовать с приютом," +
+                                "где бездомные животные находят заботу, уход, безопасность и надежду на новый дом. \n" +
+                                "Я могу рассказать вам о приюте, о его питомцах, как помочь питомцу найти свой дом, какие документы для этого необходимы и многое другое. \n" +
+                                "Жми скорее /menu"));
 
                     } else if ("/menu".equals(text)) {
                         sendMessage = new SendMessage(chatId, "выберите услугу");
@@ -61,19 +69,31 @@ public class TelegramBotUpdatesListener extends TelegramLongPollingBot {
                     } else if ("Информация о приюте".equals(text)) {
                         // "Кнопка 1"
                         // Создаем новый объект SendMessage здесь:
-                        sendMessage = new SendMessage(chatId, "Информация о приюте");
+                        sendMessage = new SendMessage(chatId, "Завести питомца — это очень серьезный шаг и здесь необходимо всё обдумать наперед!\n" +
+                                "Мы приют животных из Астаны, и в данном разделе меню, ты можешь найти необходимую информацию о нас.");
+                        sendMessage.setReplyMarkup(menuBot.sendSubmenu1());
+                        execute(sendMessage);
+                    } else if ("Расписание и адрес приюта".equals(text)) {
+                        sendMessage = new SendMessage(chatId, "Наш приют расположен по адресу: г. Красноярск, Советский проспет, д.16.\n" +
+                                "Расписание работы приюта:\n" +
+                                " - [Понедельник - Пятница: 9:00 - 18:00].\n" +
+                                " - [Суббота - Воскресенье: 10:00 - 17:00].\n" +
+                                "Чтобы попасть на территорию приюта, необходимо получить пропуск у охраны по предварительной записи.\n" +
+                                "Контактные данные охраны: +7-921-911-19-19.");
+                        sendMessage.setReplyMarkup(menuBot.sendSubmenu1());
+                        execute(sendMessage);
+                    } else if ("Оформление пропуска и схема проезда".equals(text)) {
+                        sendMessage = new SendMessage(chatId, "Для оформления пропуска необходимо при себе иметь паспорт.\n" +
+                                "После оформления пропуска Вам необходимо пройти в здание 16Д: Схема проезда указана на фото");
+                        sendPhoto(chatId, "Схема проезда", "static/123.jpg");
                         sendMessage.setReplyMarkup(menuBot.sendSubmenu1());
                         execute(sendMessage);
 
-
-
-                    } else if ("Как взять животное из приюта".equals(text)) {
+                } else if ("Как взять животное из приюта".equals(text)) {
                         //  "Кнопка 2"
                         sendMessage = new SendMessage(chatId, "Как взять животное из приюта");
                         sendMessage.setReplyMarkup(menuBot.sendSubmenu2());
                         execute(sendMessage);
-
-
                     } else if ("Прислать отчет о питомце".equals(text)) {
                         // "Кнопка 3"
                         execute(new SendMessage(chatId, "Питомец чувствует себя хорошо"));
@@ -83,9 +103,18 @@ public class TelegramBotUpdatesListener extends TelegramLongPollingBot {
                     }
                 }
             }
-        } catch (TelegramApiException e) {
+        } catch (TelegramApiException | FileNotFoundException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public void sendPhoto(String chatId, String imageCaption, String imagePath) throws FileNotFoundException, TelegramApiException {
+        File image = ResourceUtils.getFile("classpath:" + imagePath);
+        SendPhoto sendPhoto = new SendPhoto();
+        sendPhoto.setChatId(chatId);
+        // Устанавливаем путь к файлу с изображением
+        sendPhoto.setCaption(imageCaption);
+        execute(sendPhoto);
     }
 
     @Override

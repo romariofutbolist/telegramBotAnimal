@@ -1,6 +1,6 @@
 -- liquibase formatted sql
 
--- changeset denis:1
+-- changeset roman:1
 
 CREATE TABLE notification_task(
     id BIGINT,
