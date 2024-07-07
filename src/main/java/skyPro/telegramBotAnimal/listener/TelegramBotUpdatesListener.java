@@ -79,13 +79,19 @@ public class TelegramBotUpdatesListener extends TelegramLongPollingBot {
                         execute(new SendMessage(chatId, "Питомец чувствует себя хорошо"));
                     } else if ("Позвать волонтера".equals(text)) {
                         // "Кнопка 4"
-                        execute(new SendMessage(chatId, "Здравствуйте, меня зовут Иван, я волонтер приюта, чем могу помочь?"));
-                    }
+                        sendMessage = new SendMessage(chatId, "Запрос отправлен волонтеру.");
+                        execute(sendMessage);
+                        sendToVolunteer(chatId, text);                    }
                 }
             }
         } catch (TelegramApiException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private void sendToVolunteer(String chatId, String text) throws TelegramApiException {
+        final String ADMIN_ID = String.valueOf(934262991);
+        execute(new SendMessage(ADMIN_ID, "Новое обращение от @" + chatId + ": " + text));
     }
 
     @Override
