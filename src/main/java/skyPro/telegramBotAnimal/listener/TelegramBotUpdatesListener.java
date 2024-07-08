@@ -11,6 +11,7 @@ import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.TelegramBotsApi;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
+import org.telegram.telegrambots.meta.api.objects.InputFile;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
@@ -83,12 +84,14 @@ public class TelegramBotUpdatesListener extends TelegramLongPollingBot {
                         sendMessage.setReplyMarkup(menuBot.sendSubmenu1());
                         execute(sendMessage);
                     } else if ("Оформление пропуска и схема проезда".equals(text)) {
+
                         sendMessage = new SendMessage(chatId, "Для оформления пропуска необходимо при себе иметь паспорт.\n" +
                                 "После оформления пропуска Вам необходимо пройти в здание 16Д: Схема проезда указана на фото");
-                        sendPhoto(chatId, "Схема проезда", "static/123.jpg");
+sendPhoto(chatId, "asd", "C:/Users/Анна/IdeaProjects/telegramBotAnimal/target/classes/static/123.jpg");
+                        //sendPhoto(chatId, "asd", "static/123.jpg");
                         sendMessage.setReplyMarkup(menuBot.sendSubmenu1());
                         execute(sendMessage);
-
+//telegramBotAnimal/src/main/resources/static/123.jpg
                 } else if ("Как взять животное из приюта".equals(text)) {
                         //  "Кнопка 2"
                         sendMessage = new SendMessage(chatId, "Как взять животное из приюта");
@@ -108,15 +111,28 @@ public class TelegramBotUpdatesListener extends TelegramLongPollingBot {
             throw new RuntimeException(e);
         }
     }
-
     public void sendPhoto(String chatId, String imageCaption, String imagePath) throws FileNotFoundException, TelegramApiException {
-        File image = ResourceUtils.getFile("classpath:" + imagePath);
+        File imageFile = new File("C:/Users/Анна/IdeaProjects/telegramBotAnimal/target/classes/static/123.jpg");
+        InputFile photo = new InputFile(imageFile);
         SendPhoto sendPhoto = new SendPhoto();
         sendPhoto.setChatId(chatId);
-        // Устанавливаем путь к файлу с изображением
-        sendPhoto.setCaption(imageCaption);
+        sendPhoto.setPhoto(photo);
         execute(sendPhoto);
+
     }
+//    public void sendPhoto(String chatId, String imageCaption, String imagePath) throws FileNotFoundException, TelegramApiException {
+//        File image = ResourceUtils.getFile("classpath:" + imagePath);
+//        //File image = new File("C:/Users/Анна/IdeaProjects/telegramBotAnimal/target/classes/static/123.jpg");
+//        SendPhoto sendPhoto = new SendPhoto();
+//        System.out.println(image.getAbsolutePath());
+//        sendPhoto.setChatId(chatId);
+//        // Устанавливаем путь к файлу с изображением
+//        sendPhoto.setCaption(imageCaption);
+//        execute(sendPhoto);
+//    }
+
+
+
 
     private void sendToVolunteer(String chatId, String text) throws TelegramApiException {
         final String ADMIN_ID = String.valueOf(934262991);
