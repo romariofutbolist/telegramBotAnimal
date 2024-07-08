@@ -1,11 +1,15 @@
 package skyPro.telegramBotAnimal.model;
 
 import org.springframework.stereotype.Service;
+import org.springframework.util.ResourceUtils;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
+import org.telegram.telegrambots.meta.api.objects.File;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
+import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,8 +46,8 @@ public class MenuBot {
         List<KeyboardRow> submenuKeyboardRows = new ArrayList<>();
 
         KeyboardRow row = new KeyboardRow();
-        row.add("Расписание и адрес");
-        row.add("Оформление пропуска");
+        row.add("Расписание и адрес приюта");
+        row.add("Оформление пропуска и схема проезда");
         row.add("Техника безопасности");
         row.add("Запросить связь");
         submenuKeyboardRows.add(row);
@@ -74,6 +78,7 @@ public class MenuBot {
         submenuKeyboard2.setKeyboard(submenuKeyboardRows);
         return submenuKeyboard2;
     }
+
 
 
 //
