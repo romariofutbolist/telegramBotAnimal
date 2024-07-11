@@ -5,8 +5,9 @@ import javax.annotation.PostConstruct;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
-import org.springframework.util.ResourceUtils;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.TelegramBotsApi;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
@@ -16,22 +17,28 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
 import skyPro.telegramBotAnimal.model.MenuBot;
+import skyPro.telegramBotAnimal.model.Pet;
 import skyPro.telegramBotAnimal.repository.NotificationTaskRepository;
+import skyPro.telegramBotAnimal.repository.PetRepository;
+import skyPro.telegramBotAnimal.service.PetService;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 
 
-@Service
+@Component
 public class TelegramBotUpdatesListener extends TelegramLongPollingBot {
+    @Autowired
+    private PetService petService;
     private static final Logger logger = LoggerFactory.getLogger(TelegramBotUpdatesListener.class);
+
+//    private final Pet pet;
 
     private final NotificationTaskRepository repository;
     private final MenuBot menuBot;
 
 
     public TelegramBotUpdatesListener(NotificationTaskRepository repository, MenuBot menuBot) {
-
         this.repository = repository;
         this.menuBot = menuBot;
     }
@@ -87,12 +94,12 @@ public class TelegramBotUpdatesListener extends TelegramLongPollingBot {
 
                         sendMessage = new SendMessage(chatId, "Для оформления пропуска необходимо при себе иметь паспорт.\n" +
                                 "После оформления пропуска Вам необходимо пройти в здание 16Д: Схема проезда указана на фото");
-sendPhoto(chatId, "asd", "C:/Users/Анна/IdeaProjects/telegramBotAnimal/target/classes/static/123.jpg");
+                        sendPhoto(chatId, "asd", "C:/Users/Анна/IdeaProjects/telegramBotAnimal/target/classes/static/123.jpg");
                         //sendPhoto(chatId, "asd", "static/123.jpg");
                         sendMessage.setReplyMarkup(menuBot.sendSubmenu1());
                         execute(sendMessage);
 //telegramBotAnimal/src/main/resources/static/123.jpg
-                } else if ("Как взять животное из приюта".equals(text)) {
+                    } else if ("Как взять животное из приюта".equals(text)) {
                         //  "Кнопка 2"
                         sendMessage = new SendMessage(chatId, "Как взять животное из приюта");
                         sendMessage.setReplyMarkup(menuBot.sendSubmenu2());
@@ -104,13 +111,15 @@ sendPhoto(chatId, "asd", "C:/Users/Анна/IdeaProjects/telegramBotAnimal/targe
                         // "Кнопка 4"
                         sendMessage = new SendMessage(chatId, "Запрос отправлен волонтеру.");
                         execute(sendMessage);
-                        sendToVolunteer(chatId, text);                    }
+                        sendToVolunteer(chatId, text);
+                    }
                 }
             }
         } catch (TelegramApiException | FileNotFoundException e) {
             throw new RuntimeException(e);
         }
     }
+
     public void sendPhoto(String chatId, String imageCaption, String imagePath) throws FileNotFoundException, TelegramApiException {
         File imageFile = new File("C:/Users/Анна/IdeaProjects/telegramBotAnimal/target/classes/static/123.jpg");
         InputFile photo = new InputFile(imageFile);
@@ -130,8 +139,6 @@ sendPhoto(chatId, "asd", "C:/Users/Анна/IdeaProjects/telegramBotAnimal/targe
 //        sendPhoto.setCaption(imageCaption);
 //        execute(sendPhoto);
 //    }
-
-
 
 
     private void sendToVolunteer(String chatId, String text) throws TelegramApiException {
