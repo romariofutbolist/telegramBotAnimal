@@ -13,13 +13,13 @@ public class NotificationTask {
     private Long id;
     private long chat_id;
     private String text_msg;
-    @Column(name = "notification_time")
-    private LocalDateTime date;
+    @Column(name = "phone")
+    private String phone;
 
-    public NotificationTask(long chat_id, String text_msg, LocalDateTime date) {
+    public NotificationTask(long chat_id, String text_msg, String phone) {
         this.chat_id = chat_id;
         this.text_msg = text_msg;
-        this.date = date;
+        this.phone = phone;
     }
 
 
@@ -47,12 +47,12 @@ public class NotificationTask {
         this.text_msg = text_msg;
     }
 
-    public LocalDateTime getDate() {
-        return date;
+    public String getPhone() {
+        return phone;
     }
 
-    public void setDate(LocalDateTime date) {
-        this.date = date;
+    public void setPhone(String phone) {
+        this.phone = phone;
     }
 
     @Override
@@ -60,12 +60,12 @@ public class NotificationTask {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         NotificationTask that = (NotificationTask) o;
-        return chat_id == that.chat_id && Objects.equals(id, that.id) && Objects.equals(text_msg, that.text_msg) && Objects.equals(date, that.date);
+        return chat_id == that.chat_id && Objects.equals(id, that.id) && Objects.equals(text_msg, that.text_msg) && Objects.equals(phone, that.phone);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, chat_id, text_msg, date);
+        return Objects.hash(id, chat_id, text_msg, phone);
     }
 
     @Override
@@ -74,7 +74,7 @@ public class NotificationTask {
                 "id=" + id +
                 ", chat_id=" + chat_id +
                 ", text_msg='" + text_msg + '\'' +
-                ", date=" + date +
+                ", phone=" + phone +
                 '}';
     }
 }

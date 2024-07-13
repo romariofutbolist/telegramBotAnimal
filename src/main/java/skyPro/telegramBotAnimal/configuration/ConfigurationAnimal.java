@@ -2,6 +2,7 @@ package skyPro.telegramBotAnimal.configuration;
 
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 
@@ -18,6 +19,11 @@ public class ConfigurationAnimal {
 
     @Value("{telegram.bot.volunteer}")
     private String volunteer;
+
+//    @Bean
+//    public PetService petService(){
+//    return new PetService();
+//    }
 
     public String getToken() {
         return token;

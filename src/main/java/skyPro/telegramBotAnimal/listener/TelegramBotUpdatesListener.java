@@ -206,11 +206,11 @@ public class TelegramBotUpdatesListener extends TelegramLongPollingBot {
         } catch (TelegramApiException e) {
             throw new RuntimeException("ошибка");
         }
-        sendPhoto(chatId, "asd", "/home/roma/telegramBotAnimal/target/classes/static/123.jpg");
+        sendPhoto(chatId, "asd", "C:/Users/Анна/IdeaProjects/telegramBotAnimal/target/classes/static/123.jpg");
     }
 
     public void sendPhoto(long chatId, String imageCaption, String imagePath) {
-        File imageFile = new File("/home/roma/telegramBotAnimal/target/classes/static/123.jpg");
+        File imageFile = new File("C:/Users/Анна/IdeaProjects/telegramBotAnimal/target/classes/static/123.jpg");
         InputFile photo = new InputFile(imageFile);
         SendPhoto sendPhoto = new SendPhoto();
         sendPhoto.setChatId(chatId);
@@ -244,6 +244,39 @@ public class TelegramBotUpdatesListener extends TelegramLongPollingBot {
         }
     }
 
+//    private void contactPhoneNumber(long chatId, String text) {
+//        SendMessage message = new SendMessage();
+//        message.setChatId(String.valueOf(chatId));
+//        message.setText("Я могу записать Ваши контактные данные и в ближайшее время с Вами свяжется наш волонтер и проконсультируют Вас. " +
+//                "Введите номер телефона.");
+//        var matcher = PHONE_PATTERN.matcher(text);
+//        if (matcher.matches()) {
+//            repository.save(text);
+//        }
+//        //handleContactInput(chatId, text);
+//        try {
+//            execute(message);
+//        } catch (TelegramApiException e) {
+//            throw new RuntimeException("Неверный формат номера телефона. Пожалуйста, введите номер в формате +7-9---");
+//        }
+//    }
+
+
+
+//    if (matcher.matches()) {
+//        var date = parseDate(matcher.group(1));
+//        if (date == null) {
+//            telegramBot.execute(new SendMessage(chatId, "Неправильный формат даты"));
+//            return;
+//        }
+//        var task = new NotificationTask();
+//        task.setText_msg(matcher.group(3));
+//        task.setChat_id(chatId);
+//        task.setDate(date);
+//        repository.save(task);
+//        logger.info("Task has been saved: {}", task);
+//    }
+
     private void contactPhoneNumber(long chatId, String text) {
         SendMessage message = new SendMessage();
         message.setChatId(String.valueOf(chatId));
@@ -257,10 +290,12 @@ public class TelegramBotUpdatesListener extends TelegramLongPollingBot {
         }
     }
 
+
+
     private void handleContactInput(Long chatId, String text) {
         SendMessage message = new SendMessage();
         message.setChatId(String.valueOf(chatId));
-        Matcher matcher = PHONE_PATTERN.matcher(text.substring("/contact ".length()));
+        Matcher matcher = PHONE_PATTERN.matcher(text);
         if (matcher.matches()) {
             // Валидный номер телефона
             //saveContact(chatId, text);
