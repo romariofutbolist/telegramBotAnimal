@@ -1,10 +1,11 @@
 package skyPro.telegramBotAnimal.controller;
 
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import skyPro.telegramBotAnimal.model.Pet;
 import skyPro.telegramBotAnimal.service.PetService;
 
-@RestController
+@Controller
 @RequestMapping(path = "/pets")
 public class PetController {
 

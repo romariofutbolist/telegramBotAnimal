@@ -1,17 +1,20 @@
 package skyPro.telegramBotAnimal.service;
 
+
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.stereotype.Service;
 import skyPro.telegramBotAnimal.model.Pet;
 import skyPro.telegramBotAnimal.exceptions.RecordNotFoundException;
 import skyPro.telegramBotAnimal.repository.PetRepository;
 
-import java.util.logging.Logger;
 
 @Service
 public class PetService {
-    private final static Logger logger = (Logger) LoggerFactory.getLogger(PetService.class);
+
+    private final Logger logger = LoggerFactory.getLogger(PetService.class);
     @Autowired
     private final PetRepository petRepository;
 
@@ -30,7 +33,7 @@ public class PetService {
             logger.info("Питомец был найден, id =" + id);
             return petRepository.findById(id).orElseThrow(RecordNotFoundException::new);
         } catch (RecordNotFoundException e) {
-            logger.info("Питомец с id =" + id + " не найден");
+            logger.error("Питомец с id =" + id + " не найден");
             throw e;
         }
     }
