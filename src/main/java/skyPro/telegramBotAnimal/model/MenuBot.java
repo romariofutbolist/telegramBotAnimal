@@ -18,8 +18,6 @@ import java.util.List;
 
 @Service
 public class MenuBot {
-
-
     public ReplyKeyboardMarkup sendMainMenu() {
         ReplyKeyboardMarkup keyboardMarkup = new ReplyKeyboardMarkup();
         keyboardMarkup.setSelective(true);
