@@ -150,9 +150,6 @@ public class TelegramBotUpdatesListener extends TelegramLongPollingBot {
         }
     }
 
-
-
-
     private void menu(long chatId, String text) {
         SendMessage message = new SendMessage();
         message.setChatId(String.valueOf(chatId));
@@ -206,11 +203,11 @@ public class TelegramBotUpdatesListener extends TelegramLongPollingBot {
         } catch (TelegramApiException e) {
             throw new RuntimeException("ошибка");
         }
-        sendPhoto(chatId, "asd", "C:/Users/Анна/IdeaProjects/telegramBotAnimal/target/classes/static/123.jpg");
+        sendPhoto(chatId, "asd", "/Users/denis/IdeaProjects/telegramBotAnimal/src/main/resources/123.jpg");
     }
 
     public void sendPhoto(long chatId, String imageCaption, String imagePath) {
-        File imageFile = new File("C:/Users/Анна/IdeaProjects/telegramBotAnimal/target/classes/static/123.jpg");
+        File imageFile = new File("/Users/denis/IdeaProjects/telegramBotAnimal/src/main/resources/123.jpg");
         InputFile photo = new InputFile(imageFile);
         SendPhoto sendPhoto = new SendPhoto();
         sendPhoto.setChatId(chatId);
@@ -464,7 +461,7 @@ sendPhoto(chatId, "asd", "C:/Users/Анна/IdeaProjects/telegramBotAnimal/targe
     }
 
     public void sendPhoto(String chatId, String imageCaption, String imagePath) throws FileNotFoundException, TelegramApiException {
-        File imageFile = new File("C:/Users/Анна/IdeaProjects/telegramBotAnimal/target/classes/static/123.jpg");
+        File imageFile = new File("/Users/denis/IdeaProjects/telegramBotAnimal/src/main/resources/static/123.jpg");
         InputFile photo = new InputFile(imageFile);
         SendPhoto sendPhoto = new SendPhoto();
         sendPhoto.setChatId(chatId);

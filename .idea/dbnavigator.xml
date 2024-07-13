@@ -32,6 +32,9 @@
   <component name="DBNavigator.Project.ExecutionManager">
     <retain-sticky-names value="false" />
   </component>
+  <component name="DBNavigator.Project.FileConnectionMappingManager">
+    <mapping file-url="file://$PROJECT_DIR$/src/main/resources/liquibase/scripts/script1.sql" connection-id="virtual-postgres-connection" session-id="MAIN" current-schema="" />
+  </component>
   <component name="DBNavigator.Project.ObjectQuickFilterManager">
     <last-used-operator value="EQUAL" />
     <filters />
@@ -44,7 +47,7 @@
           <description value="" />
           <database-type value="POSTGRES" />
           <config-type value="BASIC" />
-          <database-version value="16.3" />
+          <database-version value="10.23" />
           <driver-source value="BUNDLED" />
           <driver-library value="" />
           <driver value="" />
@@ -56,7 +59,7 @@
           <tns-profile value="" />
           <type value="USER_PASSWORD" />
           <user value="denis" />
-          <deprecated-pwd value="" />
+          <deprecated-pwd value="NTIyMTIz" />
         </database>
         <properties>
           <auto-commit value="false" />
@@ -138,6 +141,7 @@
         <display-mode value="TABBED" />
         <navigation-history-size value="100" />
         <show-object-details value="false" />
+        <enable-sticky-paths value="true" />
       </general>
       <filters>
         <object-type-filter>
