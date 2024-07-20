@@ -7,30 +7,29 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.TelegramBotsApi;
+import org.telegram.telegrambots.meta.api.methods.send.SendDocument;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
-import org.telegram.telegrambots.meta.api.methods.updates.GetUpdates;
 import org.telegram.telegrambots.meta.api.objects.InputFile;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
 import skyPro.telegramBotAnimal.configuration.ConfigurationAnimal;
 import skyPro.telegramBotAnimal.model.MenuBot;
-import skyPro.telegramBotAnimal.model.Pet;
 import skyPro.telegramBotAnimal.repository.NotificationTaskRepository;
-import skyPro.telegramBotAnimal.repository.PetRepository;
 import skyPro.telegramBotAnimal.service.PetService;
 
+import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileNotFoundException;
+
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.Arrays;
+
 
 
 @Component
@@ -92,9 +91,9 @@ public class TelegramBotUpdatesListener extends TelegramLongPollingBot {
                     safetyEquipment(chatId, text);
                     break;
 
-                case "Запросить связь":
-                    contactPhoneNumber(chatId, text);
-                    break;
+//                case "Запросить связь":
+//                    contactPhoneNumber(chatId, text);
+//                    break;
 
                 case "Как взять животное из приюта":
                     takeAnimalFromShelter(chatId, text);
@@ -103,7 +102,15 @@ public class TelegramBotUpdatesListener extends TelegramLongPollingBot {
                 case "Позвать волонтера":
                     callToVolunteer(chatId, text);
                     break;
-
+                case "Список животных":
+                    updateFile("Список животных", "Кот барсик 4 месяца, 3 кг, цвет рыжий\n" +
+                            "Кот васька 3 месяца, 2.4 кг, цвет белый");
+                    try {
+                        sendDocument(310232057L, new File("Список животных"));
+                    } catch (TelegramApiException e) {
+                        throw new RuntimeException(e);
+                    }
+                    break;
                 default:
                     writeIncorrectText(chatId, text);
                     break;
@@ -241,7 +248,7 @@ public class TelegramBotUpdatesListener extends TelegramLongPollingBot {
         }
     }
 
-//    private void contactPhoneNumber(long chatId, String text) {
+//    private void contactPhoneNumber (long chatId, String text) {
 //        SendMessage message = new SendMessage();
 //        message.setChatId(String.valueOf(chatId));
 //        message.setText("Я могу записать Ваши контактные данные и в ближайшее время с Вами свяжется наш волонтер и проконсультируют Вас. " +
@@ -258,8 +265,6 @@ public class TelegramBotUpdatesListener extends TelegramLongPollingBot {
 //        }
 //    }
 
-
-
 //    if (matcher.matches()) {
 //        var date = parseDate(matcher.group(1));
 //        if (date == null) {
@@ -274,39 +279,37 @@ public class TelegramBotUpdatesListener extends TelegramLongPollingBot {
 //        logger.info("Task has been saved: {}", task);
 //    }
 
-    private void contactPhoneNumber(long chatId, String text) {
-        SendMessage message = new SendMessage();
-        message.setChatId(String.valueOf(chatId));
-        message.setText("Я могу записать Ваши контактные данные и в ближайшее время с Вами свяжется наш волонтер и проконсультируют Вас. " +
-                "Введите команду /contact, чтобы ввести номер телефона.");
-        handleContactInput(chatId, text);
-        try {
-            execute(message);
-        } catch (TelegramApiException e) {
-            throw new RuntimeException("ошибка");
-        }
-    }
-
-
-
-    private void handleContactInput(Long chatId, String text) {
-        SendMessage message = new SendMessage();
-        message.setChatId(String.valueOf(chatId));
-        Matcher matcher = PHONE_PATTERN.matcher(text);
-        if (matcher.matches()) {
-            // Валидный номер телефона
-            //saveContact(chatId, text);
-            message.setText("Номер телефона успешно сохранен!");
-            try {
-                execute(message);
-            } catch (TelegramApiException e) {
-                throw new RuntimeException("Неверный формат номера телефона. Пожалуйста, введите номер в формате +7-9---");
-            }
-        } else {
-            // Невалидный номер телефона
-            message.setText("Неверный формат номера телефона. Пожалуйста, введите номер в формате +7-9---");
-        }
-    }
+//    private void contactPhoneNumber(long chatId, String text) {
+//        SendMessage message = new SendMessage();
+//        message.setChatId(String.valueOf(chatId));
+//        message.setText("Я могу записать Ваши контактные данные и в ближайшее время с Вами свяжется наш волонтер и проконсультируют Вас. " +
+//                "Введите команду /contact, чтобы ввести номер телефона.");
+//        handleContactInput(chatId, text);
+//        try {
+//            execute(message);
+//        } catch (TelegramApiException e) {
+//            throw new RuntimeException("ошибка");
+//        }
+//    }
+//
+//    private void handleContactInput(Long chatId, String text) {
+//        SendMessage message = new SendMessage();
+//        message.setChatId(String.valueOf(chatId));
+//        Matcher matcher = PHONE_PATTERN.matcher(text);
+//        if (matcher.matches()) {
+//            // Валидный номер телефона
+//            //saveContact(chatId, text);
+//            message.setText("Номер телефона успешно сохранен!");
+//            try {
+//                execute(message);
+//            } catch (TelegramApiException e) {
+//                throw new RuntimeException("Неверный формат номера телефона. Пожалуйста, введите номер в формате +7-9---");
+//            }
+//        } else {
+//            // Невалидный номер телефона
+//            message.setText("Неверный формат номера телефона. Пожалуйста, введите номер в формате +7-9---");
+//        }
+//    }
 
 
     private void takeAnimalFromShelter(long chatId, String text) {
@@ -487,6 +490,23 @@ sendPhoto(chatId, "asd", "C:/Users/Анна/IdeaProjects/telegramBotAnimal/targe
     }
 
  */
+    public void sendDocument(long chatId, File file) throws TelegramApiException {
+    SendDocument request = new SendDocument();
+    request.setChatId(chatId);
+    request.setDocument(new InputFile(file));
+    execute(request);
+
+
+}
+    public void updateFile(String file, String content) {
+        try (var out = new BufferedWriter(new FileWriter(file))) {
+            out.write(content);
+
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
 
     @Override
     public String getBotToken() {

@@ -47,6 +47,7 @@ public class MenuBot {
         row.add("Оформление пропуска и схема проезда");
         row.add("Техника безопасности");
         row.add("Запросить связь");
+        row.add("Список животных");
         submenuKeyboardRows.add(row);
 
         submenuKeyboard.setKeyboard(submenuKeyboardRows);
