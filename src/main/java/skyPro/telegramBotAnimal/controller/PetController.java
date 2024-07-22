@@ -5,7 +5,7 @@ import org.springframework.web.bind.annotation.*;
 import skyPro.telegramBotAnimal.model.Pet;
 import skyPro.telegramBotAnimal.service.PetService;
 
-@Controller
+@RestController
 @RequestMapping(path = "/pets")
 public class PetController {
 

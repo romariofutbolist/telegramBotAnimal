@@ -22,6 +22,10 @@ public class NotificationTask {
         this.phone = phone;
     }
 
+    public NotificationTask() {
+
+    }
+
 
     public Long getId() {
         return id;

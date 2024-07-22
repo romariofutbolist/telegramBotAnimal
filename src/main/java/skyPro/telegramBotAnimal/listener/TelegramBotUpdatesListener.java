@@ -7,36 +7,31 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.TelegramBotsApi;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
-import org.telegram.telegrambots.meta.api.methods.updates.GetUpdates;
 import org.telegram.telegrambots.meta.api.objects.InputFile;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
 import skyPro.telegramBotAnimal.configuration.ConfigurationAnimal;
 import skyPro.telegramBotAnimal.model.MenuBot;
-import skyPro.telegramBotAnimal.model.Pet;
+import skyPro.telegramBotAnimal.model.NotificationTask;
 import skyPro.telegramBotAnimal.repository.NotificationTaskRepository;
-import skyPro.telegramBotAnimal.repository.PetRepository;
 import skyPro.telegramBotAnimal.service.PetService;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.Arrays;
 
 
 @Component
 public class TelegramBotUpdatesListener extends TelegramLongPollingBot {
     private Map<Long, String> userStates = new HashMap<>(); //
-    private static final Pattern PHONE_PATTERN = Pattern.compile("\\+7-9\\d{2}-\\d{3}-\\d{2}");
+    private static final Pattern PHONE_PATTERN = Pattern.compile("\\+7-9\\d{2}-\\d{3}-\\d{2}-\\d{2}");
 
     @Autowired
     private PetService petService;
@@ -67,47 +62,58 @@ public class TelegramBotUpdatesListener extends TelegramLongPollingBot {
         if (update.hasMessage() && update.getMessage().hasText()) {
             String text = update.getMessage().getText();
             long chatId = update.getMessage().getChatId();
-            switch (text) {
-                case "/start":
-                    startCommandReceived(chatId, text);
-                    break;
+            var state = userStates.get(chatId);
 
-                case "/menu":
-                    menu(chatId, text);
-                    break;
+            if ("PhoneListener".equals(state)) {
+                handleContactInput(chatId, text);
+                userStates.remove(chatId);
+            } else {
+                switch (text) {
+                    case "/start":
+                        startCommandReceived(chatId, text);
+                        break;
 
-                case "Информация о приюте":
-                    informationAboutShelter(chatId, text);
-                    break;
+                    case "/menu":
+                        menu(chatId, text);
+                        break;
 
-                case "Расписание и адрес приюта":
-                    adressOfShelter(chatId, text);
-                    break;
+                    case "Информация о приюте":
+                        informationAboutShelter(chatId, text);
+                        break;
 
-                case "Оформление пропуска и схема проезда":
-                    registrationOfPass(chatId, text);
-                    break;
+                    case "Расписание и адрес приюта":
+                        adressOfShelter(chatId, text);
+                        break;
 
-                case "Техника безопасности":
-                    safetyEquipment(chatId, text);
-                    break;
+                    case "Оформление пропуска и схема проезда":
+                        registrationOfPass(chatId, text);
+                        break;
 
-                case "Запросить связь":
-                    contactPhoneNumber(chatId, text);
-                    break;
+                    case "Техника безопасности":
+                        safetyEquipment(chatId, text);
+                        break;
 
-                case "Как взять животное из приюта":
-                    takeAnimalFromShelter(chatId, text);
-                    break;
+                    case "Запросить связь":
+                        contactPhoneNumber(chatId, text);
+                        break;
 
-                case "Позвать волонтера":
-                    callToVolunteer(chatId, text);
-                    break;
+                    case "Как взять животное из приюта":
+                        takeAnimalFromShelter(chatId, text);
+                        break;
 
-                default:
-                    writeIncorrectText(chatId, text);
-                    break;
+                    case "Правила знакомства и усыновления":
+                        getRulesOfBehaviorAtShelter(chatId, text);
+                        break;
 
+                    case "Позвать волонтера":
+                        callToVolunteer(chatId, text);
+                        break;
+
+                    // default:
+                    //    writeIncorrectText(chatId, text);
+                    //    break;
+
+                }
             }
 /*
             if (!userStates.containsKey(chatId)) {
@@ -149,8 +155,6 @@ public class TelegramBotUpdatesListener extends TelegramLongPollingBot {
             throw new RuntimeException();
         }
     }
-
-
 
 
     private void menu(long chatId, String text) {
@@ -206,11 +210,11 @@ public class TelegramBotUpdatesListener extends TelegramLongPollingBot {
         } catch (TelegramApiException e) {
             throw new RuntimeException("ошибка");
         }
-        sendPhoto(chatId, "asd", "C:/Users/Анна/IdeaProjects/telegramBotAnimal/target/classes/static/123.jpg");
+        sendPhoto(chatId, "asd", "/home/roma/telegramBotAnimal/target/classes/static/123.jpg");
     }
 
     public void sendPhoto(long chatId, String imageCaption, String imagePath) {
-        File imageFile = new File("C:/Users/Анна/IdeaProjects/telegramBotAnimal/target/classes/static/123.jpg");
+        File imageFile = new File("/home/roma/telegramBotAnimal/target/classes/static/123.jpg");
         InputFile photo = new InputFile(imageFile);
         SendPhoto sendPhoto = new SendPhoto();
         sendPhoto.setChatId(chatId);
@@ -244,23 +248,33 @@ public class TelegramBotUpdatesListener extends TelegramLongPollingBot {
         }
     }
 
-//    private void contactPhoneNumber(long chatId, String text) {
-//        SendMessage message = new SendMessage();
-//        message.setChatId(String.valueOf(chatId));
-//        message.setText("Я могу записать Ваши контактные данные и в ближайшее время с Вами свяжется наш волонтер и проконсультируют Вас. " +
-//                "Введите номер телефона.");
-//        var matcher = PHONE_PATTERN.matcher(text);
-//        if (matcher.matches()) {
-//            repository.save(text);
-//        }
-//        //handleContactInput(chatId, text);
-//        try {
-//            execute(message);
-//        } catch (TelegramApiException e) {
-//            throw new RuntimeException("Неверный формат номера телефона. Пожалуйста, введите номер в формате +7-9---");
-//        }
-//    }
+    private void contactPhoneNumber(long chatId, String text) {
+        SendMessage message = new SendMessage();
+        message.setChatId(String.valueOf(chatId));
+        message.setText("Я могу записать Ваши контактные данные и в ближайшее время с Вами свяжется наш волонтер и проконсультируют Вас. " +
+                "Введите - Number phone: и далее номер телефона");
+        try {
+            execute(message);
+            userStates.put(chatId, "PhoneListener");
+        } catch (TelegramApiException e) {
+            throw new RuntimeException("ошибка");
+        }
+    }
 
+    private void handleContactInput(Long chatId, String text) {
+        Matcher matcher = PHONE_PATTERN.matcher(text);
+        if (matcher.matches()) {
+            var task = new NotificationTask();
+            task.setPhone(text);
+            task.setChat_id(chatId);
+            task.setText_msg("Здесь должно быть имя");
+            task.setId(chatId);
+            repository.save(task);
+            sendMessage(chatId, "Номер телефона успешно сохранен! Нажмите кнопку /menu");
+        } else {
+            sendMessage(chatId, "Неверный формат номера телефона. Пожалуйста, введите номер в формате:" + "Number phone:+7-9**-**-**");
+        }
+    }
 
 
 //    if (matcher.matches()) {
@@ -277,12 +291,14 @@ public class TelegramBotUpdatesListener extends TelegramLongPollingBot {
 //        logger.info("Task has been saved: {}", task);
 //    }
 
-    private void contactPhoneNumber(long chatId, String text) {
+    private void takeAnimalFromShelter(long chatId, String text) {
         SendMessage message = new SendMessage();
         message.setChatId(String.valueOf(chatId));
-        message.setText("Я могу записать Ваши контактные данные и в ближайшее время с Вами свяжется наш волонтер и проконсультируют Вас. " +
-                "Введите команду /contact, чтобы ввести номер телефона.");
-        handleContactInput(chatId, text);
+        message.setText("В данном разделе я помогу тебе с выбором твоего будущего друга, " +
+                "дам список необходимых документов, чтобы забрать питомца из приюта, " +
+                "дам список рекомендаций по транспортиовке и обустройству дома для питомца " +
+                "и предоставлю контактные данные кинологов для получения советов по общению с питомцем");
+        message.setReplyMarkup(menuBot.sendSubmenu2());
         try {
             execute(message);
         } catch (TelegramApiException e) {
@@ -290,35 +306,16 @@ public class TelegramBotUpdatesListener extends TelegramLongPollingBot {
         }
     }
 
+    private void getAnimalsList() {
 
-
-    private void handleContactInput(Long chatId, String text) {
-        SendMessage message = new SendMessage();
-        message.setChatId(String.valueOf(chatId));
-        Matcher matcher = PHONE_PATTERN.matcher(text);
-        if (matcher.matches()) {
-            // Валидный номер телефона
-            //saveContact(chatId, text);
-            message.setText("Номер телефона успешно сохранен!");
-            try {
-                execute(message);
-            } catch (TelegramApiException e) {
-                throw new RuntimeException("Неверный формат номера телефона. Пожалуйста, введите номер в формате +7-9---");
-            }
-        } else {
-            // Невалидный номер телефона
-            message.setText("Неверный формат номера телефона. Пожалуйста, введите номер в формате +7-9---");
-        }
     }
 
-
-    private void takeAnimalFromShelter(long chatId, String text) {
+    private void getRulesOfBehaviorAtShelter(long chatId, String text) {
         SendMessage message = new SendMessage();
         message.setChatId(String.valueOf(chatId));
-        message.setText("В данном разделе я помогу тебе с выбором твоего будущего друга, " +
-                "дам список необходимых документов, чтобы забрать питомца из приюта, " +
-                "дам список рекомендаций по транспортиовке и обустройству дома для питомца " +
-                "и предоствлю контактные данные кинологов для получения советов по общению с питомцем");
+        message.setText("Вот Вам несколько ссылок для ознакомления. Здесь вы сможете найти необходимую для вас информацию:\n"
+                + "https://adme.media/articles/10-sovetov-kotorye-pomogut-podruzhitsya-s-neznakomoj-sobakoj-2509006/:\n" +
+                "https://www.mk.ru/social/2020/08/15/kak-vesti-sebya-s-zhivotnymi-iz-priyuta-pyat-osnovnykh-pravil.html");
         message.setReplyMarkup(menuBot.sendSubmenu2());
         try {
             execute(message);
