@@ -77,6 +77,24 @@ public class MenuBot {
         return submenuKeyboard2;
     }
 
+    public ReplyKeyboardMarkup sendSubmenu3() {
+        ReplyKeyboardMarkup submenuKeyboard3 = new ReplyKeyboardMarkup();
+        submenuKeyboard3.setSelective(true);
+        submenuKeyboard3.setResizeKeyboard(true);
+        List<KeyboardRow> submenuKeyboardRows = new ArrayList<>();
+
+        KeyboardRow row = new KeyboardRow();
+        row.add("Транспортировка животного");
+        row.add("Обустройство дома");
+        row.add("Обустройство дома для взрослого питомца");
+        row.add("Обустройство дома для питомца с ограниченными возможностями");
+        submenuKeyboardRows.add(row);
+
+
+        submenuKeyboard3.setKeyboard(submenuKeyboardRows);
+        return submenuKeyboard3;
+    }
+
 
 
 //
