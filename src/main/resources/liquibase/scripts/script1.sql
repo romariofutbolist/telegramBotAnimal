@@ -1,16 +1,20 @@
 -- liquibase formatted sql
 
--- changeset roman:1
+-- changeset annaa:1
 
 CREATE TABLE notification_task(
     id BIGINT,
     chat_id BIGINT,
-    text_msg TEXT,
-    phone TEXT
+    userName TEXT,
+    firstName TEXT,
+    lastName TEXT,
+    userID BIGINT,
+    phone TEXT,
+    pet BOOLEAN
 );
 
 
--- changeset roman:2
+-- changeset annaa:2
 
 CREATE TABLE pets(
     id BIGINT PRIMARY KEY,

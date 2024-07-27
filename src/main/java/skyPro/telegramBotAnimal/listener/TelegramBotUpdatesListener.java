@@ -14,6 +14,7 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
 import org.telegram.telegrambots.meta.api.objects.InputFile;
 import org.telegram.telegrambots.meta.api.objects.Update;
+
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
 import skyPro.telegramBotAnimal.configuration.ConfigurationAnimal;
@@ -21,7 +22,7 @@ import skyPro.telegramBotAnimal.model.MenuBot;
 import skyPro.telegramBotAnimal.model.NotificationTask;
 import skyPro.telegramBotAnimal.repository.NotificationTaskRepository;
 import skyPro.telegramBotAnimal.service.PetService;
-
+import org.telegram.telegrambots.meta.api.objects.User;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -32,10 +33,13 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 
+
 @Component
 public class TelegramBotUpdatesListener extends TelegramLongPollingBot {
-    private Map<Long, String> userStates = new HashMap<>(); //
+    private Map<Long, User> userStates = new HashMap<>(); //
+    private Map<Long, String> userStates1 = new HashMap<>();
     private static final Pattern PHONE_PATTERN = Pattern.compile("\\+7-9\\d{2}-\\d{3}-\\d{2}-\\d{2}");
+
 
     @Autowired
     private PetService petService;
@@ -65,8 +69,18 @@ public class TelegramBotUpdatesListener extends TelegramLongPollingBot {
     public void onUpdateReceived(Update update) {
         if (update.hasMessage() && update.getMessage().hasText()) {
             String text = update.getMessage().getText();
+
             long chatId = update.getMessage().getChatId();
             var state = userStates.get(chatId);
+            User user = update.getMessage().getFrom();
+            // Сохраняем информацию о пользователе
+            userStates.put(chatId, user);
+
+            // Получаем данные пользователя
+            String firstName = user.getFirstName();
+            String lastName = user.getLastName();
+            String userName = user.getUserName();
+            long userId = user.getId();
 
             if ("PhoneListener".equals(state)) {
                 handleContactInput(chatId, text);
@@ -74,7 +88,7 @@ public class TelegramBotUpdatesListener extends TelegramLongPollingBot {
             } else {
                 switch (text) {
                     case "/start":
-                        startCommandReceived(chatId, text);
+                        startCommandReceived(chatId, userName,  firstName, lastName, userId);
                         break;
 
                     case "/menu":
@@ -109,7 +123,7 @@ public class TelegramBotUpdatesListener extends TelegramLongPollingBot {
                         updateFile("Список животных", "Кот барсик 4 месяца, 3 кг, цвет рыжий\n" +
                                 "Кот васька 3 месяца, 2.4 кг, цвет белый");
                         try {
-                            sendDocument(310232057L, new File("Список животных"));
+                            sendDocument(chatId, new File("Список животных"));
                         } catch (TelegramApiException e) {
                             throw new RuntimeException(e);
                         }
@@ -132,15 +146,15 @@ public class TelegramBotUpdatesListener extends TelegramLongPollingBot {
                         break;
 
                     case "Обустройство дома":
-                        getRecommendationsHomeImprovement(chatId,text);
+                        getRecommendationsHomeImprovement(chatId, text);
                         break;
 
                     case "Обустройство дома для взрослого питомца":
-                        getRecommendationsHomeImprovementForAdult(chatId,text);
+                        getRecommendationsHomeImprovementForAdult(chatId, text);
                         break;
 
                     case "Обустройство дома для питомца с ограниченными возможностями":
-                        getRecommendationsHomeImprovementForDisabledPet(chatId,text);
+                        getRecommendationsHomeImprovementForDisabledPet(chatId, text);
                         break;
 
                     case "Советы кинолога":
@@ -182,8 +196,6 @@ public class TelegramBotUpdatesListener extends TelegramLongPollingBot {
     }
 
 
-
-
     public void sendDocument(long chatId, File file) throws TelegramApiException {
         SendDocument request = new SendDocument();
         request.setChatId(chatId);
@@ -203,9 +215,16 @@ public class TelegramBotUpdatesListener extends TelegramLongPollingBot {
     }
 
 
-    private void startCommandReceived(long chatId, String text) {
+    private void startCommandReceived(long chatId, String userName, String firstName, String lastName, long userId) {
         SendMessage message = new SendMessage();
         message.setChatId(String.valueOf(chatId));
+        var task = new NotificationTask();
+        task.setChat_id(chatId);
+        task.setUserName(userName);
+        task.setFirstName(firstName);
+        task.setLastName(lastName);
+        task.setUserID(userId);
+        repository.save(task);
         message.setText("Привет! Я бот, который поможет вам взаимодействовать с приютом,где бездомные животные находят заботу, уход, безопасность и надежду на новый дом." +
                 "\n" + "Я могу рассказать вам о приюте, о его питомцах, как помочь питомцу найти свой дом, какие документы для этого необходимы и многое другое." +
                 "\n" + "Жми скорее /menu");
@@ -281,11 +300,11 @@ public class TelegramBotUpdatesListener extends TelegramLongPollingBot {
         } catch (TelegramApiException e) {
             throw new RuntimeException("ошибка");
         }
-        sendPhoto(chatId, "asd", "/home/roma/telegramBotAnimal/target/classes/static/123.jpg");
+        sendPhoto(chatId, "asd", "C:/Users/Анна/IdeaProjects/telegramBotAnimal/target/classes/static/123.jpg");
     }
 
     public void sendPhoto(long chatId, String imageCaption, String imagePath) {
-        File imageFile = new File("/home/roma/telegramBotAnimal/target/classes/static/123.jpg");
+        File imageFile = new File("C:/Users/Анна/IdeaProjects/telegramBotAnimal/target/classes/static/123.jpg");
         InputFile photo = new InputFile(imageFile);
         SendPhoto sendPhoto = new SendPhoto();
         sendPhoto.setChatId(chatId);
@@ -295,7 +314,9 @@ public class TelegramBotUpdatesListener extends TelegramLongPollingBot {
         } catch (TelegramApiException e) {
             throw new RuntimeException("ошибка");
         }
-    }    private void getRecommendationsHomeImprovementForAdultPet(long chatId, String text) {
+    }
+
+    private void getRecommendationsHomeImprovementForAdultPet(long chatId, String text) {
     }
 
     private void safetyEquipment(long chatId, String text) {
@@ -327,7 +348,7 @@ public class TelegramBotUpdatesListener extends TelegramLongPollingBot {
                 "Введите - Number phone: и далее номер телефона");
         try {
             execute(message);
-            userStates.put(chatId, "PhoneListener");
+            userStates1.put(chatId, "PhoneListener");
         } catch (TelegramApiException e) {
             throw new RuntimeException("ошибка");
         }
