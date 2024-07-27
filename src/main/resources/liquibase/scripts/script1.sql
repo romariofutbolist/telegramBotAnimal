@@ -13,7 +13,6 @@ CREATE TABLE notification_task(
     pet BOOLEAN
 );
 
-
 -- changeset annaa:2
 
 CREATE TABLE pets(

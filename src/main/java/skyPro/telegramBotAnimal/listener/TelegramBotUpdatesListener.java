@@ -41,6 +41,7 @@ public class TelegramBotUpdatesListener extends TelegramLongPollingBot {
     private static final Pattern PHONE_PATTERN = Pattern.compile("\\+7-9\\d{2}-\\d{3}-\\d{2}-\\d{2}");
 
 
+
     @Autowired
     private PetService petService;
     private static final Logger logger = LoggerFactory.getLogger(TelegramBotUpdatesListener.class);
