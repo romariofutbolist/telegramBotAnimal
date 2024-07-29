@@ -1,6 +1,6 @@
 -- liquibase formatted sql
 
--- changeset annaa:1
+-- changeset denis:1
 
 CREATE TABLE notification_task(
     id BIGINT,
@@ -13,8 +13,8 @@ CREATE TABLE notification_task(
     pet BOOLEAN
 );
 
--- changeset annaa:2
 
+-- changeset denis:2
 CREATE TABLE pets(
     id BIGINT PRIMARY KEY,
     name TEXT,
