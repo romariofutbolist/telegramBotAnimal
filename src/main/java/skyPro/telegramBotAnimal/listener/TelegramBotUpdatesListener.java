@@ -18,6 +18,7 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
 import skyPro.telegramBotAnimal.configuration.ConfigurationAnimal;
 import skyPro.telegramBotAnimal.model.MenuBot;
+import skyPro.telegramBotAnimal.model.NotificationTask;
 import skyPro.telegramBotAnimal.repository.NotificationTaskRepository;
 import skyPro.telegramBotAnimal.service.PetService;
 
@@ -66,9 +67,12 @@ public class TelegramBotUpdatesListener extends TelegramLongPollingBot {
         if (update.hasMessage() && update.getMessage().hasText()) {
             String text = update.getMessage().getText();
             long chatId = update.getMessage().getChatId();
+            String login = update.getMessage().getFrom().getUserName();
             switch (text) {
                 case "/start":
+                    saveUserToDatabase(chatId, login, "", "");
                     startCommandReceived(chatId, text);
+
                     break;
 
                 case "/menu":
@@ -506,7 +510,14 @@ sendPhoto(chatId, "asd", "C:/Users/Анна/IdeaProjects/telegramBotAnimal/targe
             throw new RuntimeException(e);
         }
     }
-
+    public void saveUserToDatabase(long chatId, String login, String phone, String text_msg) {
+        var task = new NotificationTask();
+        task.setChat_id(chatId);
+        task.setPhone(phone);
+        task.setLogin(login);
+        task.setText_msg(text_msg);
+        repository.save(task);
+    }
 
     @Override
     public String getBotToken() {

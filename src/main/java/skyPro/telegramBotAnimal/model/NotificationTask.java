@@ -15,13 +15,27 @@ public class NotificationTask {
     private String text_msg;
     @Column(name = "phone")
     private String phone;
+    private String login;
 
-    public NotificationTask(long chat_id, String text_msg, String phone) {
+
+    public NotificationTask(long chat_id, String text_msg, String phone, String login) {
+        this.login = login;
         this.chat_id = chat_id;
         this.text_msg = text_msg;
         this.phone = phone;
     }
 
+    public NotificationTask() {
+
+    }
+
+    public String getLogin() {
+        return login;
+    }
+
+    public void setLogin(String login) {
+        this.login = login;
+    }
 
     public Long getId() {
         return id;
@@ -60,12 +74,12 @@ public class NotificationTask {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         NotificationTask that = (NotificationTask) o;
-        return chat_id == that.chat_id && Objects.equals(id, that.id) && Objects.equals(text_msg, that.text_msg) && Objects.equals(phone, that.phone);
+        return chat_id == that.chat_id && Objects.equals(id, that.id) && Objects.equals(text_msg, that.text_msg) && Objects.equals(phone, that.phone) && Objects.equals(login, that.login);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, chat_id, text_msg, phone);
+        return Objects.hash(id, chat_id, text_msg, phone, login);
     }
 
     @Override
@@ -75,6 +89,7 @@ public class NotificationTask {
                 ", chat_id=" + chat_id +
                 ", text_msg='" + text_msg + '\'' +
                 ", phone=" + phone +
+                ", login=" + login +
                 '}';
     }
 }
