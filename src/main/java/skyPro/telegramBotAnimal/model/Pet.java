@@ -15,7 +15,6 @@ import java.util.Objects;
 public class Pet {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-
     private long id;
     @Column(nullable = false)
     private String name;
@@ -27,6 +26,7 @@ public class Pet {
     private String food;
     @Column
     private String shelter;
+
 //    @JsonIgnore
 
     public Pet(long id, String name, String breed, int age, String food, String shelter) {
@@ -100,5 +100,17 @@ public class Pet {
     @Override
     public int hashCode() {
         return Objects.hash(id, name, breed, age, food, shelter);
+    }
+
+    @Override
+    public String toString() {
+        return "Pet{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", breed='" + breed + '\'' +
+                ", age=" + age +
+                ", food='" + food + '\'' +
+                ", shelter='" + shelter + '\'' +
+                '}';
     }
 }
