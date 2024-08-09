@@ -2,7 +2,7 @@
 
 -- changeset annaa:1
 
-CREATE TABLE notification_task(
+CREATE TABLE public.users(
     id BIGINT,
     chat_id BIGINT,
     text_msg TEXT,

@@ -10,21 +10,18 @@ import skyPro.telegramBotAnimal.model.Pet;
 import skyPro.telegramBotAnimal.exceptions.RecordNotFoundException;
 import skyPro.telegramBotAnimal.repository.PetRepository;
 
-import javax.transaction.Transactional;
+import java.util.List;
 
 
 @Service
 public class PetService {
 
     private final Logger logger = LoggerFactory.getLogger(PetService.class);
-    @Autowired
     private final PetRepository petRepository;
-
 
     public PetService(PetRepository petRepository) {
         this.petRepository = petRepository;
     }
-
 
     public Pet addPet(Pet pet) {
         logger.info("Питомец добавлен");
@@ -56,6 +53,11 @@ public class PetService {
                     return true;
                 }).orElse(false);
     }
+
+    public List<Pet> getAll() {
+        return petRepository.findAll();
+    }
+
 
 
 }

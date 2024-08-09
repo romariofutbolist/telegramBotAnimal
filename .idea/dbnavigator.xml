@@ -17,7 +17,7 @@
   </component>
   <component name="DBNavigator.Project.DatabaseConsoleManager">
     <connection id="25bd23e4-83d3-4f3d-a24a-08ebd483137d">
-      <console name="Connection" type="STANDARD" schema="" session="Main" />
+      <console name="Connection" type="STANDARD" schema="pg_catalog" session="Main" />
     </connection>
   </component>
   <component name="DBNavigator.Project.DatabaseEditorStateManager">
@@ -29,11 +29,21 @@
   <component name="DBNavigator.Project.DatabaseSessionManager">
     <connection id="25bd23e4-83d3-4f3d-a24a-08ebd483137d" />
   </component>
+  <component name="DBNavigator.Project.DatasetFilterManager">
+    <filter-actions connection-id="25bd23e4-83d3-4f3d-a24a-08ebd483137d" dataset="public.pets" active-filter-id="7808bcc3-c217-4662-bbb3-ba703159f6ff">
+      <filter id="7808bcc3-c217-4662-bbb3-ba703159f6ff" name="Filter 1" temporary="false" custom-name="false" type="basic" join-type="AND">
+        <condition column="id" operator="=" value="" active="true" />
+      </filter>
+    </filter-actions>
+    <filter-actions connection-id="25bd23e4-83d3-4f3d-a24a-08ebd483137d" dataset="public.notification_task" active-filter-id="EMPTY_FILTER">
+      <filter id="f9fb64a5-ae86-4b6a-9401-26cf387b9616" name="Filter 1" temporary="false" custom-name="false" type="basic" join-type="AND">
+        <condition column="chat_id" operator="=" value="" active="true" />
+      </filter>
+    </filter-actions>
+    <filter-actions connection-id="25bd23e4-83d3-4f3d-a24a-08ebd483137d" dataset="information_schema.sql_implementation_info" active-filter-id="" />
+  </component>
   <component name="DBNavigator.Project.ExecutionManager">
     <retain-sticky-names value="false" />
-  </component>
-  <component name="DBNavigator.Project.FileConnectionMappingManager">
-    <mapping file-url="file://$PROJECT_DIR$/src/main/resources/liquibase/scripts/script1.sql" connection-id="" session-id="MAIN" current-schema="" />
   </component>
   <component name="DBNavigator.Project.ObjectQuickFilterManager">
     <last-used-operator value="EQUAL" />
@@ -54,12 +64,12 @@
           <url-type value="DATABASE" />
           <host value="localhost" />
           <port value="5432" />
-          <database value="postgres" />
+          <database value="animal" />
           <tns-folder value="" />
           <tns-profile value="" />
           <type value="USER_PASSWORD" />
-          <user value="denis" />
-          <deprecated-pwd value="" />
+          <user value="roman_animal" />
+          <deprecated-pwd value="dGdfYW5pbWFs" />
         </database>
         <properties>
           <auto-commit value="false" />

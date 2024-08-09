@@ -2,17 +2,17 @@
 
 -- changeset roman:1
 
-CREATE TABLE notification_task(
+CREATE TABLE public.users(
     id BIGINT,
-    chat_id BIGINT,
-    text_msg TEXT,
+    chat_Id BIGINT,
+    name TEXT,
     phone TEXT
 );
 
 
 -- changeset roman:2
 
-CREATE TABLE pets(
+CREATE TABLE public.pets(
     id BIGINT PRIMARY KEY,
     name TEXT,
     BREED TEXT,

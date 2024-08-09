@@ -22,14 +22,14 @@ public class Pet {
     @Column(nullable = false)
     private String breed;
     @Column(nullable = false)
-     private Integer age;
+     private int age;
     @Column(nullable = false)
     private String food;
     @Column
     private String shelter;
 //    @JsonIgnore
 
-    public Pet(Long id, String name, String breed, int age, String food, String shelter) {
+    public Pet(long id, String name, String breed, int age, String food, String shelter) {
         this.id = id;
         this.name = name;
         this.breed = breed;
@@ -100,5 +100,17 @@ public class Pet {
     @Override
     public int hashCode() {
         return Objects.hash(id, name, breed, age, food, shelter);
+    }
+
+    @Override
+    public String toString() {
+        return "Pet{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", breed='" + breed + '\'' +
+                ", age=" + age +
+                ", food='" + food + '\'' +
+                ", shelter='" + shelter + '\'' +
+                '}';
     }
 }
