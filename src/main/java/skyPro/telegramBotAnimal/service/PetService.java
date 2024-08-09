@@ -10,6 +10,8 @@ import skyPro.telegramBotAnimal.model.Pet;
 import skyPro.telegramBotAnimal.exceptions.RecordNotFoundException;
 import skyPro.telegramBotAnimal.repository.PetRepository;
 
+import javax.transaction.Transactional;
+
 
 @Service
 public class PetService {
@@ -22,6 +24,7 @@ public class PetService {
     public PetService(PetRepository petRepository) {
         this.petRepository = petRepository;
     }
+
 
     public Pet addPet(Pet pet) {
         logger.info("Питомец добавлен");
@@ -48,12 +51,11 @@ public class PetService {
     public boolean deletePet(long id) {
         logger.info("Питомец с id = {} был удален" + id);
         return petRepository.findById(id)
-                .map(entity ->{
+                .map(entity -> {
                     petRepository.delete(entity);
                     return true;
                 }).orElse(false);
     }
-
 
 
 }

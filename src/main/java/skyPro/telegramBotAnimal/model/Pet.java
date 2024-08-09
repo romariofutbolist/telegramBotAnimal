@@ -14,22 +14,22 @@ import java.util.Objects;
 
 public class Pet {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+ //   @GeneratedValue(strategy = GenerationType.IDENTITY)
 
-    private long id;
+    private Long id;
     @Column(nullable = false)
     private String name;
     @Column(nullable = false)
     private String breed;
     @Column(nullable = false)
-     private int age;
+     private Integer age;
     @Column(nullable = false)
     private String food;
     @Column
     private String shelter;
 //    @JsonIgnore
 
-    public Pet(long id, String name, String breed, int age, String food, String shelter) {
+    public Pet(Long id, String name, String breed, int age, String food, String shelter) {
         this.id = id;
         this.name = name;
         this.breed = breed;

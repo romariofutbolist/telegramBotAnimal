@@ -1,6 +1,5 @@
 package skyPro.telegramBotAnimal.controller;
 
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import skyPro.telegramBotAnimal.model.Pet;
 import skyPro.telegramBotAnimal.service.PetService;
@@ -10,6 +9,7 @@ import skyPro.telegramBotAnimal.service.PetService;
 public class PetController {
 
     private final PetService petService;
+
 
     public PetController(PetService petService) {
         this.petService = petService;
