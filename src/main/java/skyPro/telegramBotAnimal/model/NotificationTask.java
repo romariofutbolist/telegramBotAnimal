@@ -1,6 +1,7 @@
 package skyPro.telegramBotAnimal.model;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 @Entity
@@ -11,29 +12,29 @@ public class NotificationTask {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private long chat_id;
-    private String userName;
-    @Column(name = "firstName", nullable = false)
-    private String firstName;
-    private String lastName;
-    private long userID;
     private String text_msg;
     @Column(name = "phone")
     private String phone;
+    private String login;
 
-    public NotificationTask(Long id, long chat_id, String userName, String firstName, String lastName, long userID, String text_msg, String phone) {
-        this.id = id;
+
+    public NotificationTask(long chat_id, String text_msg, String phone, String login) {
+        this.login = login;
         this.chat_id = chat_id;
-        this.userName = userName;
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.userID = userID;
         this.text_msg = text_msg;
         this.phone = phone;
     }
 
-
     public NotificationTask() {
 
+    }
+
+    public String getLogin() {
+        return login;
+    }
+
+    public void setLogin(String login) {
+        this.login = login;
     }
 
     public Long getId() {
@@ -50,38 +51,6 @@ public class NotificationTask {
 
     public void setChat_id(long chat_id) {
         this.chat_id = chat_id;
-    }
-
-    public String getUserName() {
-        return userName;
-    }
-
-    public void setUserName(String userName) {
-        this.userName = userName;
-    }
-
-    public String getFirstName() {
-        return firstName;
-    }
-
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
-
-    public String getLastName() {
-        return lastName;
-    }
-
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
-    }
-
-    public long getUserID() {
-        return userID;
-    }
-
-    public void setUserID(long userID) {
-        this.userID = userID;
     }
 
     public String getText_msg() {
@@ -105,11 +74,22 @@ public class NotificationTask {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         NotificationTask that = (NotificationTask) o;
-        return chat_id == that.chat_id && userID == that.userID && Objects.equals(id, that.id) && Objects.equals(userName, that.userName) && Objects.equals(firstName, that.firstName) && Objects.equals(lastName, that.lastName) && Objects.equals(text_msg, that.text_msg) && Objects.equals(phone, that.phone);
+        return chat_id == that.chat_id && Objects.equals(id, that.id) && Objects.equals(text_msg, that.text_msg) && Objects.equals(phone, that.phone) && Objects.equals(login, that.login);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, chat_id, userName, firstName, lastName, userID, text_msg, phone);
+        return Objects.hash(id, chat_id, text_msg, phone, login);
+    }
+
+    @Override
+    public String toString() {
+        return "NotificationTask{" +
+                "id=" + id +
+                ", chat_id=" + chat_id +
+                ", text_msg='" + text_msg + '\'' +
+                ", phone=" + phone +
+                ", login=" + login +
+                '}';
     }
 }
