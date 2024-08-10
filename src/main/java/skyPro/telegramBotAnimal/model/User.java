@@ -8,7 +8,8 @@ import java.util.Objects;
 public class User {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.TABLE)
+    @Column(name = "id")
     private long id;
     @Column(name = "chat_Id")
     private long chatId;
@@ -19,8 +20,7 @@ public class User {
     @Column(name = "login")
     private String login;
 
-    public User(long id, long chatId, String name, String phone, String login) {
-        this.id = id;
+    public User(long chatId, String name, String phone, String login) {
         this.chatId = chatId;
         this.name = name;
         this.phone = phone;
@@ -31,13 +31,6 @@ public class User {
 
     }
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
 
     public long getChatId() {
         return chatId;

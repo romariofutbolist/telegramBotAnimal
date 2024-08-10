@@ -2,8 +2,8 @@
 
 -- changeset annaa:1
 
-CREATE TABLE public.users(
-    id BIGINT,
+CREATE TABLE users(
+    id INTEGER PRIMARY KEY ,
     chat_Id BIGINT,
     name TEXT,
     phone TEXT,
@@ -13,7 +13,7 @@ CREATE TABLE public.users(
 
 -- changeset annaa:2
 CREATE TABLE pets(
-    id BIGINT PRIMARY KEY,
+    id INTEGER PRIMARY KEY ,
     name TEXT,
     BREED TEXT,
     AGE INTEGER,
