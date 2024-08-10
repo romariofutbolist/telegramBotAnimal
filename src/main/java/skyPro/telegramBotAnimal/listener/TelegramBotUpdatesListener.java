@@ -76,7 +76,6 @@ public class TelegramBotUpdatesListener extends TelegramLongPollingBot {
             String login = update.getMessage().getFrom().getUserName();
             var state = userStates.get(chatId);
             var user = userService.findByUser(chatId);
-            //if (user == null) {
 
             if ("PhoneListener".equals(state)) {
                 handleContactInput(chatId, text);
