@@ -2,7 +2,7 @@
 
 -- changeset roman:1
 
-CREATE TABLE public.users(
+CREATE TABLE users(
     id BIGINT,
     chat_Id BIGINT,
     name TEXT,
@@ -13,7 +13,7 @@ CREATE TABLE public.users(
 
 -- changeset roman:2
 
-CREATE TABLE public.pets(
+CREATE TABLE pets(
     id BIGINT PRIMARY KEY,
     name TEXT,
     BREED TEXT,

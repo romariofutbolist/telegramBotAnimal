@@ -73,113 +73,108 @@ public class TelegramBotUpdatesListener extends TelegramLongPollingBot {
         if (update.hasMessage() && update.getMessage().hasText()) {
             String text = update.getMessage().getText();
             long chatId = update.getMessage().getChatId();
-            String login =  update.getMessage().getFrom().getUserName();
-            long id = 0;
+            String login = update.getMessage().getFrom().getUserName();
             var state = userStates.get(chatId);
             var user = userService.findByUser(chatId);
-            if (user == null) {
+            //if (user == null) {
 
-                if ("PhoneListener".equals(state)) {
-                    handleContactInput(chatId, text, update.getMessage().getChat().getFirstName());
-                    userStates.remove(chatId);
-                } else {
-                    switch (text) {
-                        case "/start":
-                            startCommandReceived(id, chatId, update.getMessage().getChat().getFirstName(), login);
-                            break;
-
-                        case "/menu":
-                            menu(chatId, text);
-                            break;
-
-                        case "Информация о приюте":
-                            informationAboutShelter(chatId, text);
-                            break;
-
-                        case "Расписание и адрес приюта":
-                            adressOfShelter(chatId, text);
-                            break;
-
-                        case "Оформление пропуска и схема проезда":
-                            registrationOfPass(chatId, text);
-                            break;
-
-                        case "Техника безопасности":
-                            safetyEquipment(chatId, text);
-                            break;
-
-                        case "Запросить связь":
-                            contactPhoneNumber(chatId, text);
-                            break;
-
-                        case "Как взять животное из приюта":
-                            takeAnimalFromShelter(chatId, text);
-                            break;
-
-                        case "Список животных":
-                            showPets(chatId);
-                            break;
-
-                        case "Правила знакомства и усыновления":
-                            getRulesOfBehaviorAtShelter(chatId, text);
-                            break;
-
-                        case "Список необходимых документов":
-                            provideListOfDocuments(chatId, text);
-                            break;
-
-                        case "Рекомендации":
-                            getRecommendations(chatId, text);
-                            break;
-
-                        case "Транспортировка животного":
-                            getRecommendationsAnimalTransportation(chatId, text);
-                            break;
-
-                        case "Обустройство дома":
-                            getRecommendationsHomeImprovement(chatId, text);
-                            break;
-
-                        case "Обустройство дома для взрослого питомца":
-                            getRecommendationsHomeImprovementForAdult(chatId, text);
-                            break;
-
-                        case "Обустройство дома для питомца с ограниченными возможностями":
-                            getRecommendationsHomeImprovementForDisabledPet(chatId, text);
-                            break;
-
-                        case "Советы кинолога":
-                            getAdviceFromDogHandler(chatId, text);
-                            break;
-
-                        case "Проверенные кинологи":
-                            getDogHandlerContacts(chatId, text);
-                            break;
-
-                        case "Причины отказа":
-                            getReasonsForRefusal(chatId, text);
-                            break;
-
-                        case "Позвать волонтера":
-                            callToVolunteer(chatId, text);
-                            break;
-
-
-                        default:
-                            var count = incorrectCounts.getOrDefault(chatId, 0);
-                            if (count < 2) {
-                                incorrectCounts.put(chatId, count + 1);
-                                writeIncorrectText(chatId, text);
-                            } else {
-                                writeIncorrectText2(chatId, text);
-                            }
-                            //break;
-
-
-                    }
-                }
+            if ("PhoneListener".equals(state)) {
+                handleContactInput(chatId, text);
+                userStates.remove(chatId);
             } else {
-                informationAboutShelter(chatId, text);
+                switch (text) {
+                    case "/start":
+                        if (user == null) {
+                            startCommandReceived(chatId, update.getMessage().getChat().getFirstName(), login);
+                            break;
+                        }
+
+                    case "/menu":
+                        menu(chatId, text);
+                        break;
+
+                    case "Информация о приюте":
+                        informationAboutShelter(chatId, text);
+                        break;
+
+                    case "Расписание и адрес приюта":
+                        adressOfShelter(chatId, text);
+                        break;
+
+                    case "Оформление пропуска и схема проезда":
+                        registrationOfPass(chatId, text);
+                        break;
+
+                    case "Техника безопасности":
+                        safetyEquipment(chatId, text);
+                        break;
+
+                    case "Запросить связь":
+                        contactPhoneNumber(chatId, text);
+                        break;
+
+                    case "Как взять животное из приюта":
+                        takeAnimalFromShelter(chatId, text);
+                        break;
+
+                    case "Список животных":
+                        showPets(chatId);
+                        break;
+
+                    case "Правила знакомства и усыновления":
+                        getRulesOfBehaviorAtShelter(chatId, text);
+                        break;
+
+                    case "Список необходимых документов":
+                        provideListOfDocuments(chatId, text);
+                        break;
+
+                    case "Рекомендации":
+                        getRecommendations(chatId, text);
+                        break;
+
+                    case "Транспортировка животного":
+                        getRecommendationsAnimalTransportation(chatId, text);
+                        break;
+
+                    case "Обустройство дома":
+                        getRecommendationsHomeImprovement(chatId, text);
+                        break;
+
+                    case "Обустройство дома для взрослого питомца":
+                        getRecommendationsHomeImprovementForAdult(chatId, text);
+                        break;
+
+                    case "Обустройство дома для питомца с ограниченными возможностями":
+                        getRecommendationsHomeImprovementForDisabledPet(chatId, text);
+                        break;
+
+                    case "Советы кинолога":
+                        getAdviceFromDogHandler(chatId, text);
+                        break;
+
+                    case "Проверенные кинологи":
+                        getDogHandlerContacts(chatId, text);
+                        break;
+
+                    case "Причины отказа":
+                        getReasonsForRefusal(chatId, text);
+                        break;
+
+                    case "Позвать волонтера":
+                        callToVolunteer(chatId, text);
+                        break;
+
+
+                    default:
+                        var count = incorrectCounts.getOrDefault(chatId, 0);
+                        if (count < 2) {
+                            incorrectCounts.put(chatId, count + 1);
+                            writeIncorrectText(chatId, text);
+                        } else {
+                            writeIncorrectText2(chatId, text);
+                        }
+                }
             }
         }
     }
@@ -204,12 +199,13 @@ public class TelegramBotUpdatesListener extends TelegramLongPollingBot {
     }
 
 
-    private void startCommandReceived(long id, long chatId, String name, String login) {
+    private void startCommandReceived(long chatId, String name, String login) {
         SendMessage message = new SendMessage();
         var user = new User();
         user.setChatId(chatId);
         user.setName(name);
-        user.setId(++id);
+        user.setId(chatId);
+        user.setId(user.getId());
         user.setLogin(login);
         repository.save(user);
         message.setChatId(String.valueOf(chatId));
@@ -304,9 +300,6 @@ public class TelegramBotUpdatesListener extends TelegramLongPollingBot {
         }
     }
 
-    private void getRecommendationsHomeImprovementForAdultPet(long chatId, String text) {
-    }
-
     private void safetyEquipment(long chatId, String text) {
         SendMessage message = new SendMessage();
         message.setChatId(String.valueOf(chatId));
@@ -333,7 +326,7 @@ public class TelegramBotUpdatesListener extends TelegramLongPollingBot {
         SendMessage message = new SendMessage();
         message.setChatId(String.valueOf(chatId));
         message.setText("Я могу записать Ваши контактные данные и в ближайшее время с Вами свяжется наш волонтер и проконсультируют Вас. " +
-                "Введите - Number phone: и далее номер телефона");
+                "Введите номер телефона");
         try {
             execute(message);
             userStates.put(chatId, "PhoneListener");
@@ -342,20 +335,15 @@ public class TelegramBotUpdatesListener extends TelegramLongPollingBot {
         }
     }
 
-    private void handleContactInput(Long chatId, String text, String name) {
+    private void handleContactInput(Long chatId, String text) {
         Matcher matcher = PHONE_PATTERN.matcher(text);
         if (matcher.matches()) {
-            //var task = repository.findByChatId(chatId);
-            //var task = userService.findByUser(chatId);
-            var task = new User();
+            var task = repository.findByChatId(chatId);
             task.setPhone(text);
-            task.setChatId(chatId);
-            task.setName(name);
-            task.setId(chatId);
             repository.save(task);
             sendMessage(chatId, "Номер телефона успешно сохранен! Нажмите кнопку /menu");
         } else {
-            sendMessage(chatId, "Неверный формат номера телефона. Пожалуйста, введите номер в формате:" + "Number phone:+7-9**-**-**");
+            sendMessage(chatId, "Неверный формат номера телефона. Пожалуйста, введите номер в формате:" + "+7-9**-**-**");
         }
     }
 
