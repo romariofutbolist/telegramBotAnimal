@@ -16,12 +16,15 @@ public class User {
     private String name;
     @Column(name = "phone")
     private String phone;
+    @Column(name = "login")
+    private String login;
 
-    public User(long id, long chatId, String name, String phone) {
+    public User(long id, long chatId, String name, String phone, String login) {
         this.id = id;
         this.chatId = chatId;
         this.name = name;
         this.phone = phone;
+        this.login = login;
     }
 
     public User() {
@@ -60,26 +63,39 @@ public class User {
         this.phone = phone;
     }
 
+    public void setId(long id) {
+        this.id = id;
+    }
+
+    public String getLogin() {
+        return login;
+    }
+
+    public void setLogin(String login) {
+        this.login = login;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        User that = (User) o;
-        return chatId == that.chatId && Objects.equals(id, that.id) && Objects.equals(name, that.name) && Objects.equals(phone, that.phone);
+        User user = (User) o;
+        return id == user.id && chatId == user.chatId && Objects.equals(name, user.name) && Objects.equals(phone, user.phone) && Objects.equals(login, user.login);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, chatId, name, phone);
+        return Objects.hash(id, chatId, name, phone, login);
     }
 
     @Override
     public String toString() {
-        return "NotificationTask{" +
+        return "User{" +
                 "id=" + id +
-                ", chat_id=" + chatId +
-                ", text_msg='" + name + '\'' +
-                ", phone=" + phone +
+                ", chatId=" + chatId +
+                ", name='" + name + '\'' +
+                ", phone='" + phone + '\'' +
+                ", login='" + login + '\'' +
                 '}';
     }
 }

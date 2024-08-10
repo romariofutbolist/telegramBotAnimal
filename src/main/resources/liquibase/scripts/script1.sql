@@ -4,10 +4,10 @@
 
 CREATE TABLE public.users(
     id BIGINT,
-    chat_id BIGINT,
-    text_msg TEXT,
-    phone text,
-    login text
+    chat_Id BIGINT,
+    name TEXT,
+    phone TEXT,
+    login TEXT
 );
 
 

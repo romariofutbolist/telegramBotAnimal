@@ -6,7 +6,8 @@ CREATE TABLE public.users(
     id BIGINT,
     chat_Id BIGINT,
     name TEXT,
-    phone TEXT
+    phone TEXT,
+    login TEXT
 );
 
 
