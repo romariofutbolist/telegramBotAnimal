@@ -1,6 +1,6 @@
 -- liquibase formatted sql
 
--- changeset annaa:1
+-- changeset denis:1
 
 CREATE TABLE users(
     id INTEGER PRIMARY KEY ,
@@ -11,7 +11,7 @@ CREATE TABLE users(
 );
 
 
--- changeset annaa:2
+-- changeset denis:2
 CREATE TABLE pets(
     id INTEGER PRIMARY KEY ,
     name TEXT,
