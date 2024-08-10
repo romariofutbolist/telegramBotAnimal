@@ -73,6 +73,8 @@ public class TelegramBotUpdatesListener extends TelegramLongPollingBot {
         if (update.hasMessage() && update.getMessage().hasText()) {
             String text = update.getMessage().getText();
             long chatId = update.getMessage().getChatId();
+            String login =  update.getMessage().getFrom().getUserName();
+            long id = 0;
             var state = userStates.get(chatId);
             var user = userService.findByUser(chatId);
             if (user == null) {
@@ -83,7 +85,7 @@ public class TelegramBotUpdatesListener extends TelegramLongPollingBot {
                 } else {
                     switch (text) {
                         case "/start":
-                            startCommandReceived(chatId, update.getMessage().getChat().getFirstName());
+                            startCommandReceived(id, chatId, update.getMessage().getChat().getFirstName(), login);
                             break;
 
                         case "/menu":
@@ -202,13 +204,14 @@ public class TelegramBotUpdatesListener extends TelegramLongPollingBot {
     }
 
 
-    private void startCommandReceived(long chatId, String name) {
+    private void startCommandReceived(long id, long chatId, String name, String login) {
         SendMessage message = new SendMessage();
-        var task = new User();
-        task.setChatId(chatId);
-        task.setName(name);
-        task.setId(chatId);
-        repository.save(task);
+        var user = new User();
+        user.setChatId(chatId);
+        user.setName(name);
+        user.setId(++id);
+        user.setLogin(login);
+        repository.save(user);
         message.setChatId(String.valueOf(chatId));
         message.setText("Привет, " + name + ". Я бот, который поможет вам взаимодействовать с приютом,где бездомные животные находят заботу, уход, безопасность и надежду на новый дом." +
                 "\n" + "Я могу рассказать вам о приюте, о его питомцах, как помочь питомцу найти свой дом, какие документы для этого необходимы и многое другое." +
