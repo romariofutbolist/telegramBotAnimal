@@ -163,7 +163,7 @@ public class TelegramBotUpdatesListener extends TelegramLongPollingBot {
                         break;
 
                     case "Проверенные кинологи":
-                        getDogHandlerContacts(chatId, text);
+                        getDogHandlerContacts(chatId);
                         break;
 
                     case "Причины отказа":
@@ -433,19 +433,13 @@ public class TelegramBotUpdatesListener extends TelegramLongPollingBot {
     }
 
     //Кнока 1.2.4:
-    private void getDogHandlerContacts(long chatId, String text) {
-        SendMessage message = new SendMessage();
-        message.setChatId(String.valueOf(chatId));
-        message.setText("Мной дан список проверенных кинологов для общения с ними:\n" +
-                "1. Алексей, 43 года. Стаж: 20 лет. Контактные данные:\n" +
-                "");
+    private void getDogHandlerContacts(long chatId) {
+        String text ="Мной дан список проверенных кинологов для общения с ними:\n" +
+                "1. Алексей, 43 года. Стаж: 20 лет. Контактные данные:+7-923-232-34-54. \n" +
+                "2. Георгий, 30 лет. Стаж: 7 лет. Контактные данные:+7-923-555-30-90. \n" +
+                "3. Юлия, 26 лет. Стаж: 3 года. Контактные данные:+7-923-987-78-79. \n";
+        sendMessage(chatId, text);
         sendToDogHandler(String.valueOf(chatId), text);
-
-        try {
-            execute(message);
-        } catch (TelegramApiException e) {
-            throw new RuntimeException("ошибка");
-        }
     }
 
     //Кнока 1.2.4:
