@@ -2,8 +2,8 @@
 
 -- changeset roman:1
 
-CREATE TABLE public.users(
-    id BIGINT,
+CREATE TABLE users(
+    id BIGSERIAL,
     chat_Id BIGINT,
     name TEXT,
     phone TEXT,
@@ -13,8 +13,8 @@ CREATE TABLE public.users(
 
 -- changeset roman:2
 
-CREATE TABLE public.pets(
-    id BIGINT PRIMARY KEY,
+CREATE TABLE pets(
+    id BIGSERIAL PRIMARY KEY,
     name TEXT,
     BREED TEXT,
     AGE INTEGER,

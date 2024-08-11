@@ -7,8 +7,9 @@ import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
 import org.telegram.telegrambots.meta.api.objects.File;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
-
+import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -47,7 +48,7 @@ public class MenuBot {
         row.add("Оформление пропуска и схема проезда");
         row.add("Техника безопасности");
         row.add("Запросить связь");
-        row.add("Список животных");
+        row.add("Назад");
         submenuKeyboardRows.add(row);
 
         submenuKeyboard.setKeyboard(submenuKeyboardRows);
@@ -70,6 +71,7 @@ public class MenuBot {
         row02.add("Проверенные кинологи");
         row02.add("Причины отказа");
         row02.add("Запросить связь");
+        row02.add("Назад");
         submenuKeyboardRows.add(row01);
         submenuKeyboardRows.add(row02);
 
@@ -88,11 +90,28 @@ public class MenuBot {
         row.add("Обустройство дома");
         row.add("Обустройство дома для взрослого питомца");
         row.add("Обустройство дома для питомца с ограниченными возможностями");
+        row.add("Вернуться");
         submenuKeyboardRows.add(row);
-
 
         submenuKeyboard3.setKeyboard(submenuKeyboardRows);
         return submenuKeyboard3;
+    }
+
+    public ReplyKeyboardMarkup sendSubmenu4() {
+        ReplyKeyboardMarkup submenuKeyboard4 = new ReplyKeyboardMarkup();
+        submenuKeyboard4.setSelective(true);
+        submenuKeyboard4.setResizeKeyboard(true);
+        List<KeyboardRow> submenuKeyboardRows = new ArrayList<>();
+
+        KeyboardRow row = new KeyboardRow();
+        row.add("Форма ежедневного отчета");
+        row.add("Отчет");
+        row.add("Позвать волонтера");
+        row.add("Назад");
+        submenuKeyboardRows.add(row);
+
+        submenuKeyboard4.setKeyboard(submenuKeyboardRows);
+        return submenuKeyboard4;
     }
 
 

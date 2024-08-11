@@ -15,4 +15,5 @@ public class UserService {
     public User findByUser(long chatId) {
         return userRepository.findByChatId(chatId);
     }
+
 }

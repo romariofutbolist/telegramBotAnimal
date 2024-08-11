@@ -3,7 +3,7 @@
 -- changeset denis:1
 
 CREATE TABLE users(
-    id INTEGER PRIMARY KEY ,
+    id BIGSERIAL,
     chat_Id BIGINT,
     name TEXT,
     phone TEXT,
@@ -12,8 +12,9 @@ CREATE TABLE users(
 
 
 -- changeset denis:2
+
 CREATE TABLE pets(
-    id INTEGER PRIMARY KEY ,
+    id BIGSERIAL PRIMARY KEY,
     name TEXT,
     BREED TEXT,
     AGE INTEGER,
