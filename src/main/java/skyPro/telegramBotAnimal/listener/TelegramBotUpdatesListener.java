@@ -289,6 +289,9 @@ public class TelegramBotUpdatesListener extends TelegramLongPollingBot {
     }
 
     //Метод, позволяющий отправить пользователю картинку - схема проезда
+    //    C:/Users/Анна/IdeaProjects/telegramBotAnimal/target/classes/static/123.jpg
+    //    /home/roma/telegramBotAnimal/target/classes/static/123.jpg
+    //    /Users/denis/IdeaProjects/telegramBotAnimal/src/main/resources/123.jpg
     public void sendPhoto(long chatId) {
         String imagePath = "/home/roma/telegramBotAnimal/target/classes/static/123.jpg";
         File imageFile = new File(imagePath);
