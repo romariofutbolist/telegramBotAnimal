@@ -3,14 +3,12 @@ package skyPro.telegramBotAnimal.listener;
 
 import javax.annotation.PostConstruct;
 
-import liquibase.pro.packaged.S;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.TelegramBotsApi;
-import org.telegram.telegrambots.meta.api.methods.send.SendDocument;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
 import org.telegram.telegrambots.meta.api.objects.InputFile;
@@ -22,14 +20,13 @@ import skyPro.telegramBotAnimal.configuration.ConfigurationAnimal;
 import skyPro.telegramBotAnimal.model.MenuBot;
 import skyPro.telegramBotAnimal.model.User;
 import skyPro.telegramBotAnimal.model.Pet;
+import skyPro.telegramBotAnimal.repository.PetRepository;
 import skyPro.telegramBotAnimal.repository.UserRepository;
 import skyPro.telegramBotAnimal.service.PetService;
 import skyPro.telegramBotAnimal.service.UserService;
 
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -53,14 +50,16 @@ public class TelegramBotUpdatesListener extends TelegramLongPollingBot {
 //    private final Pet pet;
 
     private final UserRepository repository;
+    private final PetRepository petRepository;
     private final MenuBot menuBot;
 
 
-    public TelegramBotUpdatesListener(ConfigurationAnimal animal, UserRepository repository, MenuBot menuBot, UserService userService) {
+    public TelegramBotUpdatesListener(ConfigurationAnimal animal, UserRepository repository, MenuBot menuBot, UserService userService, PetRepository petRepository) {
         this.animal = animal;
         this.repository = repository;
         this.menuBot = menuBot;
         this.userService = userService;
+        this.petRepository = petRepository;
     }
 
     @PostConstruct
@@ -358,16 +357,41 @@ public class TelegramBotUpdatesListener extends TelegramLongPollingBot {
         List<Pet> pets = petService.getAll();
         StringBuilder petsInfo = new StringBuilder("Наши питомцы:\n");
 
-        // Проход по каждому питомцу и добавление информации о нем в строку сообщения
-        for (Pet pet : pets) {
-            petsInfo.append("Имя: ").append(pet.getName()).append("\n")
-                    .append("Порода: ").append(pet.getBreed()).append("\n")
-                    .append("Возраст: ").append(pet.getAge()).append("\n\n");
+        // Получите список доступных животных
+        Collection<Pet> availablePets = petRepository.getAvailableAnimals();
+
+        // Создайте сообщение о доступных животных
+        for (Pet pet : availablePets) {
+            petsInfo.append(pet.getName()).append("\n");
         }
 
-        // Отправка сообщения в Telegram
-        sendMessage(chatId, petsInfo.toString());
+        // Отправьте сообщение в Telegram
+        sendMessage(chatId ,petsInfo.toString());
     }
+
+
+
+//    public void getShowPets(long chatId) {
+//        List<Pet> pets = petService.getAll();
+//        StringBuilder petsInfo = new StringBuilder("Наши питомцы:\n");
+//        return petRepository.getAvailableAnimals();
+//
+//        // Проход по каждому питомцу и добавление информации о нем в строку сообщения
+//
+//
+//        for (Pet pet : pets) {
+//            // Проверяем, есть ли значение в chatId
+//            if (pet.getUserId() == null) {
+//                petsInfo.append("Имя: ").append(pet.getName()).append("\n")
+//                        .append("Порода: ").append(pet.getBreed()).append("\n")
+//                        .append("Возраст: ").append(pet.getAge()).append("\n\n");
+//
+//        }
+//
+//
+//        // Отправка сообщения в Telegram
+//        sendMessage(chatId, petsInfo.toString());
+//    }
 
     //Кнопка 1.2.2: Правила знакомства и усыновления
     private void getRulesOfBehaviorAtShelter(long chatId) {
@@ -545,6 +569,10 @@ public class TelegramBotUpdatesListener extends TelegramLongPollingBot {
                 "и предоставлю контактные данные кинологов для получения советов по общению с питомцем";
         sendMessage2(chatId, text, menuBot.sendSubmenu2());
     }
+
+
+
+
 
     @Override
     public String getBotToken() {

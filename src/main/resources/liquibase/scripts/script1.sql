@@ -3,21 +3,49 @@
 -- changeset annaa:1
 
 CREATE TABLE users(
-    id BIGSERIAL,
+    user_id BIGSERIAL PRIMARY KEY,
     chat_Id BIGINT,
     name TEXT,
     phone TEXT,
-    login TEXT
+    login TEXT,
+    pet_id INT
 );
 
 
--- changeset roman:2
+-- changeset annaa:2
 
 CREATE TABLE pets(
-    id BIGSERIAL PRIMARY KEY,
+    pet_id BIGSERIAL PRIMARY KEY,
     name TEXT,
     BREED TEXT,
     AGE INTEGER,
     FOOD TEXT,
-    SHELTER TEXT
+    SHELTER TEXT,
+    user_id INT
 );
+
+
+-- changeset annaa:3
+
+CREATE TABLE user_pet (
+  user_id INT,
+  pet_id INT,
+  PRIMARY KEY (user_id, pet_id),
+  FOREIGN KEY (user_id) REFERENCES users(user_id),
+  FOREIGN KEY (pet_id) REFERENCES pets(pet_id)
+);
+
+---- changeset annaa:3
+--
+--ALTER TABLE users
+--ADD COLUMN pet_id VARCHAR(255);
+--
+---- changeset annaa:4
+--
+--ALTER TABLE pets
+--ADD COLUMN user_id VARCHAR(255);
+
+---- changeset annaa:4
+--DROP TABLE users CASCADE;
+--DROP TABLE pets CASCADE;
+
