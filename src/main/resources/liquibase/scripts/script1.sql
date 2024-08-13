@@ -21,3 +21,12 @@ CREATE TABLE pets(
     FOOD TEXT,
     SHELTER TEXT
 );
+
+    -- changeset roman:3
+
+CREATE TABLE petReport(
+    id BIGSERIAL,
+    textOfReport TEXT,
+    data TIMESTAMP
+);
+

@@ -20,8 +20,10 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
 import skyPro.telegramBotAnimal.configuration.ConfigurationAnimal;
 import skyPro.telegramBotAnimal.model.MenuBot;
+import skyPro.telegramBotAnimal.model.PetReport;
 import skyPro.telegramBotAnimal.model.User;
 import skyPro.telegramBotAnimal.model.Pet;
+import skyPro.telegramBotAnimal.repository.ReportRepository;
 import skyPro.telegramBotAnimal.repository.UserRepository;
 import skyPro.telegramBotAnimal.service.PetService;
 import skyPro.telegramBotAnimal.service.UserService;
@@ -30,6 +32,9 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -42,25 +47,26 @@ public class TelegramBotUpdatesListener extends TelegramLongPollingBot {
     private Map<Long, String> userStates = new HashMap<>(); //
     private Map<Long, Integer> incorrectCounts = new HashMap<>(); //
     private static final Pattern PHONE_PATTERN = Pattern.compile("\\+7-9\\d{2}-\\d{3}-\\d{2}-\\d{2}");
+    private static final Pattern ANSWER_PATTERN = Pattern.compile("([0-9\\.\\:\\s]{16})(\\s)([\\W+]+)");
+    private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm");
 
+    private static final Logger logger = LoggerFactory.getLogger(TelegramBotUpdatesListener.class);
 
     @Autowired
     private PetService petService;
     private UserService userService;
-    private static final Logger logger = LoggerFactory.getLogger(TelegramBotUpdatesListener.class);
-
     private final ConfigurationAnimal animal;
-//    private final Pet pet;
-
     private final UserRepository repository;
+    private final ReportRepository reportRepository;
     private final MenuBot menuBot;
 
 
-    public TelegramBotUpdatesListener(ConfigurationAnimal animal, UserRepository repository, MenuBot menuBot, UserService userService) {
+    public TelegramBotUpdatesListener(ConfigurationAnimal animal, UserRepository repository, MenuBot menuBot, UserService userService, ReportRepository reportRepository) {
         this.animal = animal;
         this.repository = repository;
         this.menuBot = menuBot;
         this.userService = userService;
+        this.reportRepository = reportRepository;
     }
 
     @PostConstruct
@@ -82,7 +88,15 @@ public class TelegramBotUpdatesListener extends TelegramLongPollingBot {
             if ("PhoneListener".equals(state)) {
                 handleContactInput(chatId, text);
                 userStates.remove(chatId);
-            } else {
+            }
+
+            else if ("SendReport".equals(state)) {
+                addReportInRepository(chatId, text);
+                userStates.remove(chatId);
+            }
+
+
+            else {
                 switch (text) {
                     case "/start":
                         if (user == null) {
@@ -181,6 +195,11 @@ public class TelegramBotUpdatesListener extends TelegramLongPollingBot {
                     case "Форма ежедневного отчета":
                         sendDailyReportForm(chatId);
                         break;
+
+                    case "Отчет":
+                        sendReport(chatId);
+                        break;
+
 
 
                     default:
@@ -546,6 +565,41 @@ public class TelegramBotUpdatesListener extends TelegramLongPollingBot {
         sendMessage2(chatId, text, menuBot.sendSubmenu2());
     }
 
+
+    //Кнопка 1.3.2: Отчет
+    private void sendReport(long chatId) {
+        String text = "Здесь необходмо составить отчет и отправить";
+        sendMessage(chatId, text);
+        userStates.put(chatId, "SendReport");
+    }
+
+    private void addReportInRepository(Long chatId, String text) {
+        Matcher matcher = ANSWER_PATTERN.matcher(text);
+        if (matcher.matches()) {
+            var date = parseDate(matcher.group(1));
+            if(date == null) {
+                sendMessage(chatId, "Неправильный формат даты");
+                return;
+            }
+            var task = new PetReport();
+            task.setTextOfReport(matcher.group(3));
+            task.setData(date);
+            reportRepository.save(task);
+            sendMessage(chatId, "Отчет успешно добавлен");
+        } else {
+            sendMessage(chatId, "Неверный формат отчета");
+        }
+    }
+
+    private LocalDateTime parseDate(String date) {
+        try {
+            return LocalDateTime.parse(date, DATE_TIME_FORMATTER);
+        } catch (DateTimeParseException e) {
+            logger.error("Incorrect date format: {}", date);
+        }
+        return null;
+    }
+
     @Override
     public String getBotToken() {
         return animal.getToken();
@@ -557,4 +611,49 @@ public class TelegramBotUpdatesListener extends TelegramLongPollingBot {
     }
 }
 
+/*
+public int process(List<Update> updates) {
+    updates.forEach(update -> {
+        logger.info("Processing update: {}", update);
+        var message = update.message();
 
+        if (message != null) {
+            var text = update.message().text();
+            var chatId = update.message().chat().id();
+            if (text != null) {
+                if("/start".equals(text)) {
+                    telegramBot.execute(new SendMessage(chatId, "Добро пожаловать!"));
+                } else {
+                    // 01.01.2022 20:00 Сделать домашнюю работу
+                    var matcher = PATTERN.matcher(text);
+                    if(matcher.matches()) {
+                        var date = parseDate(matcher.group(1));
+                        if(date == null) {
+                            telegramBot.execute(new SendMessage(chatId, "Неправильный формат даты"));
+                            return;
+                        }
+                        var task = new NotificationTask();
+                        task.setText(matcher.group(3));
+                        task.setChatId(chatId);
+                        task.setTaskDate(date);
+                        notificationTaskRepository.save(task);
+                        logger.info("Task has been saved: {}", task);
+                    }
+                }
+            }
+
+        }
+    });
+    return UpdatesListener.CONFIRMED_UPDATES_ALL;
+}
+
+private LocalDateTime parseDate(String date) {
+    try {
+        return LocalDateTime.parse(date, DATE_TIME_FORMATTER);
+    } catch (DateTimeParseException e) {
+        logger.error("Incorrect date format: {}", date);
+    }
+    return null;
+}
+
+ */
