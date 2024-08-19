@@ -18,11 +18,6 @@ public class User {
     private String phone;
     @Column(name = "login")
     private String login;
-    /*
-    @Column(name = "status")
-    private boolean status;
-
-     */
 
     @OneToOne
     @JoinColumn(name = "pet_id")

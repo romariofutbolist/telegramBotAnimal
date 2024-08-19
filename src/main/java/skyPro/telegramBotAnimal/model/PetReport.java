@@ -16,7 +16,7 @@ public class PetReport {
     private String animalsDiet;
     private String animalHealth;
     private String animalHabits;
-    private LocalDate data;
+    private LocalDateTime data;
 
     @OneToOne
     @JoinColumn(name = "user_id")
@@ -67,11 +67,11 @@ public class PetReport {
         this.user = user;
     }
 
-    public LocalDate getData() {
+    public LocalDateTime getData() {
         return data;
     }
 
-    public void setData(LocalDate data) {
+    public void setData(LocalDateTime data) {
         this.data = data;
     }
 

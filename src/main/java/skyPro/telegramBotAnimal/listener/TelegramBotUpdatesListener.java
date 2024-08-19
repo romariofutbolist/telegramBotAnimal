@@ -600,7 +600,7 @@ public class TelegramBotUpdatesListener extends TelegramLongPollingBot {
             task.setAnimalsDiet(matcher.group(1));
             task.setAnimalHealth(matcher.group(3));
             task.setAnimalHabits(matcher.group(5));
-            task.setData(LocalDate.now());
+            task.setData(LocalDateTime.now());
             task.setUser(repository.findByChatId(chatId));
             reportRepository.save(task);
             sendMessage(chatId, "Отчет успешно добавлен");

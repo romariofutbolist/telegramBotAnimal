@@ -15,35 +15,14 @@ import java.util.Objects;
 public class Pet {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    //@Column(name = "id")
     private long id;
-    //@Column(nullable = false)
-    //@Column(name = "name")
     private String name;
-    //@Column(nullable = false)
-    //@Column(name = "breed")
     private String breed;
-    //@Column(nullable = false)
-    //@Column(name = "age")
-     private int age;
-    //@Column(nullable = false)
-    //@Column(name = "food")
+    private int age;
     private String food;
-    //@Column
-    //@Column(name = "shelter")
     private String shelter;
 
-//    @JsonIgnore
-
-    public Pet(long id, String name, String breed, int age, String food, String shelter) {
-        this.id = id;
-        this.name = name;
-        this.breed = breed;
-        this.age = age;
-        this.food = food;
-        this.shelter = shelter;
-    }
-    public Pet(){
+    public Pet() {
 
     }
 
