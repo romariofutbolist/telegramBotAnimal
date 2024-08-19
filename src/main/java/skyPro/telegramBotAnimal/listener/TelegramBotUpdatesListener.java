@@ -23,6 +23,7 @@ import skyPro.telegramBotAnimal.model.MenuBot;
 import skyPro.telegramBotAnimal.model.PetReport;
 import skyPro.telegramBotAnimal.model.User;
 import skyPro.telegramBotAnimal.model.Pet;
+import skyPro.telegramBotAnimal.repository.PetRepository;
 import skyPro.telegramBotAnimal.repository.ReportRepository;
 import skyPro.telegramBotAnimal.repository.UserRepository;
 import skyPro.telegramBotAnimal.service.PetService;
@@ -32,6 +33,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
@@ -48,6 +50,8 @@ public class TelegramBotUpdatesListener extends TelegramLongPollingBot {
     private Map<Long, Integer> incorrectCounts = new HashMap<>(); //
     private static final Pattern PHONE_PATTERN = Pattern.compile("\\+7-9\\d{2}-\\d{3}-\\d{2}-\\d{2}");
     private static final Pattern ANSWER_PATTERN = Pattern.compile("([0-9\\.\\:\\s]{16})(\\s)([\\W+]+)");
+    private static final Pattern ANSWER_PATTERN1 = Pattern.compile("([\\W+]+)(\n)([\\W+]+)(\n)([\\W+]+)");
+    private static final Pattern ANSWER_PATTERN2 = Pattern.compile("[0-9]");
     private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm");
 
     private static final Logger logger = LoggerFactory.getLogger(TelegramBotUpdatesListener.class);
@@ -59,14 +63,16 @@ public class TelegramBotUpdatesListener extends TelegramLongPollingBot {
     private final UserRepository repository;
     private final ReportRepository reportRepository;
     private final MenuBot menuBot;
+    private final PetRepository petRepository;
 
 
-    public TelegramBotUpdatesListener(ConfigurationAnimal animal, UserRepository repository, MenuBot menuBot, UserService userService, ReportRepository reportRepository) {
+    public TelegramBotUpdatesListener(ConfigurationAnimal animal, UserRepository repository, MenuBot menuBot, UserService userService, ReportRepository reportRepository, PetRepository petRepository) {
         this.animal = animal;
         this.repository = repository;
         this.menuBot = menuBot;
         this.userService = userService;
         this.reportRepository = reportRepository;
+        this.petRepository = petRepository;
     }
 
     @PostConstruct
@@ -244,6 +250,13 @@ public class TelegramBotUpdatesListener extends TelegramLongPollingBot {
         user.setId(chatId);
         user.setId(user.getId());
         user.setLogin(login);
+        //user.setStatus(false);
+        /*
+        if(user.isStatus()==false) {
+            boolean pet_id = user.getPet() == null;
+        }
+
+         */
         repository.save(user);
         sendMessage(chatId, "Привет, " + name + ". Я бот, который поможет вам взаимодействовать с приютом,где бездомные животные находят заботу, уход, безопасность и надежду на новый дом." +
                 "\n" + "Я могу рассказать вам о приюте, о его питомцах, как помочь питомцу найти свой дом, какие документы для этого необходимы и многое другое." +
@@ -568,22 +581,27 @@ public class TelegramBotUpdatesListener extends TelegramLongPollingBot {
 
     //Кнопка 1.3.2: Отчет
     private void sendReport(long chatId) {
-        String text = "Здесь необходмо составить отчет и отправить";
+        String text = """
+                Здесь необходмо составить отчет и отправить нашему сотруднику.\s
+                Образец отчета смотри ниже. Есть 3 темы. \s
+                Рацион животного.\s
+                Общее самочувствие и привыкание к новому месту.\s
+                Изменения в поведении: отказ от старых привычек, приобретение новых.\s
+
+                Каждая тема с новой строки.""";
         sendMessage(chatId, text);
         userStates.put(chatId, "SendReport");
     }
 
     private void addReportInRepository(Long chatId, String text) {
-        Matcher matcher = ANSWER_PATTERN.matcher(text);
+        Matcher matcher = ANSWER_PATTERN1.matcher(text);
         if (matcher.matches()) {
-            var date = parseDate(matcher.group(1));
-            if(date == null) {
-                sendMessage(chatId, "Неправильный формат даты");
-                return;
-            }
             var task = new PetReport();
-            task.setTextOfReport(matcher.group(3));
-            task.setData(date);
+            task.setAnimalsDiet(matcher.group(1));
+            task.setAnimalHealth(matcher.group(3));
+            task.setAnimalHabits(matcher.group(5));
+            task.setData(LocalDate.now());
+            task.setUser(repository.findByChatId(chatId));
             reportRepository.save(task);
             sendMessage(chatId, "Отчет успешно добавлен");
         } else {

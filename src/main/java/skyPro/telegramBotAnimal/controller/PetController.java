@@ -34,4 +34,9 @@ public class PetController {
     public boolean deletePet(@RequestParam long id) {
         return petService.deletePet(id);
     }
+
+    @GetMapping("adopt")
+    public void adopt(@RequestParam long petId, @RequestParam long userId) {
+        petService.adopt(petId, userId);
+    }
 }

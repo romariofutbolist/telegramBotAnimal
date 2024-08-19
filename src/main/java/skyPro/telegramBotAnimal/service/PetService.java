@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import skyPro.telegramBotAnimal.model.Pet;
 import skyPro.telegramBotAnimal.exceptions.RecordNotFoundException;
 import skyPro.telegramBotAnimal.repository.PetRepository;
+import skyPro.telegramBotAnimal.repository.UserRepository;
 
 import java.util.List;
 
@@ -18,9 +19,11 @@ public class PetService {
 
     private final Logger logger = LoggerFactory.getLogger(PetService.class);
     private final PetRepository petRepository;
+    private final UserRepository userRepository;
 
-    public PetService(PetRepository petRepository) {
+    public PetService(PetRepository petRepository, UserRepository userRepository) {
         this.petRepository = petRepository;
+        this.userRepository = userRepository;
     }
 
 
@@ -60,7 +63,19 @@ public class PetService {
     }
 
 
+    public void adopt(long petId, long userId) {
+        var user = userRepository.findById(userId).orElse(null);
+        if(user==null || user.getPet()!=null) {
+            throw new RuntimeException();
+        }
+        var pet = petRepository.findById(petId).orElse(null);
+        if(pet==null) {
+            throw new RuntimeException();
+        }
+        user.setPet(pet);
+        userRepository.save(user);
 
+    }
 }
 
 

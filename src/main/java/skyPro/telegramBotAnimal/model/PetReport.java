@@ -1,39 +1,27 @@
 package skyPro.telegramBotAnimal.model;
 
-import org.hibernate.annotations.Entity;
-import org.springframework.data.annotation.Id;
-
-import javax.persistence.Column;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Table;
+import javax.persistence.*;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
+
 @Entity
-@Table(name = "petReport")
+@Table(name = "pet_report")
 public class PetReport {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
-    private String textOfReport;
-    private LocalDateTime data;
+    private String animalsDiet;
+    private String animalHealth;
+    private String animalHabits;
+    private LocalDate data;
 
+    @OneToOne
+    @JoinColumn(name = "user_id")
+    private User user;
 
-    private long userId;
-
-    //    @Lob
-    //@Column(columnDefinition = "MEDIUMBLOB")
-    //private byte[] data;
-
-
-    public PetReport(long id, String textOfReport, LocalDateTime data, long userId) {
-        this.id = id;
-        this.textOfReport = textOfReport;
-        this.data = data;
-        this.userId = userId;
-    }
 
     public PetReport() {
     }
@@ -46,28 +34,45 @@ public class PetReport {
         this.id = id;
     }
 
-    public String getTextOfReport() {
-        return textOfReport;
+
+    public String getAnimalsDiet() {
+        return animalsDiet;
     }
 
-    public void setTextOfReport(String textOfReport) {
-        this.textOfReport = textOfReport;
+    public void setAnimalsDiet(String animalsDiet) {
+        this.animalsDiet = animalsDiet;
     }
 
-    public LocalDateTime getData() {
+    public String getAnimalHealth() {
+        return animalHealth;
+    }
+
+    public void setAnimalHealth(String animalHealth) {
+        this.animalHealth = animalHealth;
+    }
+
+    public String getAnimalHabits() {
+        return animalHabits;
+    }
+
+    public void setAnimalHabits(String animalHabits) {
+        this.animalHabits = animalHabits;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    public LocalDate getData() {
         return data;
     }
 
-    public void setData(LocalDateTime data) {
+    public void setData(LocalDate data) {
         this.data = data;
-    }
-
-    public long getUserId() {
-        return userId;
-    }
-
-    public void setUserId(long userId) {
-        this.userId = userId;
     }
 
     @Override
@@ -75,21 +80,23 @@ public class PetReport {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         PetReport petReport = (PetReport) o;
-        return id == petReport.id && userId == petReport.userId && Objects.equals(textOfReport, petReport.textOfReport) && Objects.equals(data, petReport.data);
+        return id == petReport.id && Objects.equals(animalsDiet, petReport.animalsDiet) && Objects.equals(animalHealth, petReport.animalHealth) && Objects.equals(animalHabits, petReport.animalHabits) && Objects.equals(data, petReport.data) && Objects.equals(user, petReport.user);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, textOfReport, data, userId);
+        return Objects.hash(id, animalsDiet, animalHealth, animalHabits, data, user);
     }
 
     @Override
     public String toString() {
         return "PetReport{" +
                 "id=" + id +
-                ", textOfReport='" + textOfReport + '\'' +
+                ", animalsDiet='" + animalsDiet + '\'' +
+                ", animalHealth='" + animalHealth + '\'' +
+                ", animalHabits='" + animalHabits + '\'' +
                 ", data=" + data +
-                ", userId=" + userId +
+                ", user=" + user +
                 '}';
     }
 }
