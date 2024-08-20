@@ -35,6 +35,14 @@ CREATE TABLE user_pet (
   FOREIGN KEY (pet_id) REFERENCES pets(pet_id)
 );
 
+-- changeset annaa:4
+CREATE TABLE report(
+    chat_Id BIGINT,
+    text TEXT,
+    photo BYTEA
+);
+
+
 ---- changeset annaa:3
 --
 --ALTER TABLE users

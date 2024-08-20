@@ -6,26 +6,30 @@ import javax.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.TelegramBotsApi;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
 import org.telegram.telegrambots.meta.api.objects.InputFile;
+import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboard;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
 import skyPro.telegramBotAnimal.configuration.ConfigurationAnimal;
 import skyPro.telegramBotAnimal.model.MenuBot;
+import skyPro.telegramBotAnimal.model.Report;
 import skyPro.telegramBotAnimal.model.User;
 import skyPro.telegramBotAnimal.model.Pet;
 import skyPro.telegramBotAnimal.repository.PetRepository;
+import skyPro.telegramBotAnimal.repository.ReportRepository;
 import skyPro.telegramBotAnimal.repository.UserRepository;
 import skyPro.telegramBotAnimal.service.PetService;
 import skyPro.telegramBotAnimal.service.UserService;
 
-import java.io.File;
+import java.io.*;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -51,15 +55,21 @@ public class TelegramBotUpdatesListener extends TelegramLongPollingBot {
 
     private final UserRepository repository;
     private final PetRepository petRepository;
+    private final ReportRepository reportRepository;
     private final MenuBot menuBot;
+    private final Report report;
 
 
-    public TelegramBotUpdatesListener(ConfigurationAnimal animal, UserRepository repository, MenuBot menuBot, UserService userService, PetRepository petRepository) {
+    public TelegramBotUpdatesListener(PetService petService, ConfigurationAnimal animal, UserRepository repository, MenuBot menuBot, UserService userService, PetRepository petRepository, ReportRepository reportRepository, Report report) {
+        this.petService = petService;
         this.animal = animal;
         this.repository = repository;
         this.menuBot = menuBot;
         this.userService = userService;
         this.petRepository = petRepository;
+        this.reportRepository = reportRepository;
+
+        this.report = report;
     }
 
     @PostConstruct
@@ -71,129 +81,154 @@ public class TelegramBotUpdatesListener extends TelegramLongPollingBot {
 
     @Override
     public void onUpdateReceived(Update update) {
-        if (update.hasMessage() && update.getMessage().hasText()) {
-            String text = update.getMessage().getText();
-            long chatId = update.getMessage().getChatId();
-            String login = update.getMessage().getFrom().getUserName();
-            var state = userStates.get(chatId);
-            var user = userService.findByUser(chatId);
 
-            if ("PhoneListener".equals(state)) {
-                handleContactInput(chatId, text);
-                userStates.remove(chatId);
-            } else {
-                switch (text) {
-                    case "/start":
-                        if (user == null) {
-                            startCommandReceived(chatId, update.getMessage().getChat().getFirstName(), login);
-                            break;
-                        }
+        String text = update.getMessage().getText();
+        long chatId = update.getMessage().getChatId();
+        String login = update.getMessage().getFrom().getUserName();
+        var state = userStates.get(chatId);
+        var user = userService.findByUser(chatId);
 
-                    case "/menu":
-                        menu(chatId);
+        if (update.hasMessage() && update.getMessage().hasPhoto()) {
+            Message message = update.getMessage();
+
+            // Сохранение в базу данных
+            try {
+                saveToDatabase(chatId, text, report.getPhoto());
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+
+
+//            PhotoSize largestPhoto = getLargestPhoto(update.getMessage().getPhoto());
+//            String photoUrl = largestPhoto.getFileId();
+//            // Сохраняем текст и ссылку на картинку в базу данных
+//            saveToDatabase(chatId, text, photoUrl);
+
+            // Отправляем подтверждение
+//            try {
+//                SendMessage message = new SendMessage();
+//                message.setChatId(String.valueOf(chatId));
+//                execute(new SendMessage(message.getChatId(), "Сообщение и картинка успешно сохранены!"));
+//            } catch (TelegramApiException e) {
+//                e.printStackTrace();
+//            }
+        } else if (update.hasMessage() && update.getMessage().hasText() && "PhoneListener".equals(state)) {
+            handleContactInput(chatId, text);
+            userStates.remove(chatId);
+
+        } else {
+            switch (text) {
+                case "/start":
+                    if (user == null) {
+                        startCommandReceived(chatId, update.getMessage().getChat().getFirstName(), login);
                         break;
+                    }
 
-                    case "Информация о приюте":
-                        getInformationAboutShelter(chatId);
-                        break;
+                case "/menu":
+                    menu(chatId);
+                    break;
 
-                    case "Расписание и адрес приюта":
-                        getAdressOfShelter(chatId);
-                        break;
+                case "Информация о приюте":
+                    getInformationAboutShelter(chatId);
+                    break;
 
-                    case "Оформление пропуска и схема проезда":
-                        IssuePassAndGetDrivingDirections(chatId);
-                        break;
+                case "Расписание и адрес приюта":
+                    getAdressOfShelter(chatId);
+                    break;
 
-                    case "Техника безопасности":
-                        getSafetyEquipment(chatId);
-                        break;
+                case "Оформление пропуска и схема проезда":
+                    IssuePassAndGetDrivingDirections(chatId);
+                    break;
 
-                    case "Запросить связь":
-                        writeDownContactPhoneNumber(chatId);
-                        break;
+                case "Техника безопасности":
+                    getSafetyEquipment(chatId);
+                    break;
 
-                    case "Назад":
-                        goBack(chatId);
-                        break;
+                case "Запросить связь":
+                    writeDownContactPhoneNumber(chatId);
+                    break;
 
-                    case "Как взять животное из приюта":
-                        takeAnimalFromShelter(chatId);
-                        break;
+                case "Назад":
+                    goBack(chatId);
+                    break;
 
-                    case "Список животных":
-                        getShowPets(chatId);
-                        break;
+                case "Как взять животное из приюта":
+                    takeAnimalFromShelter(chatId);
+                    break;
 
-                    case "Правила знакомства и усыновления":
-                        getRulesOfBehaviorAtShelter(chatId);
-                        break;
+                case "Список животных":
+                    getShowPets(chatId);
+                    break;
 
-                    case "Список необходимых документов":
-                        provideListOfDocuments(chatId);
-                        break;
+                case "Правила знакомства и усыновления":
+                    getRulesOfBehaviorAtShelter(chatId);
+                    break;
 
-                    case "Рекомендации":
-                        getRecommendations(chatId);
-                        break;
+                case "Список необходимых документов":
+                    provideListOfDocuments(chatId);
+                    break;
 
-                    case "Транспортировка животного":
-                        getRecommendationsAnimalTransportation(chatId);
-                        break;
+                case "Рекомендации":
+                    getRecommendations(chatId);
+                    break;
 
-                    case "Обустройство дома":
-                        getRecommendationsHomeImprovement(chatId);
-                        break;
+                case "Транспортировка животного":
+                    getRecommendationsAnimalTransportation(chatId);
+                    break;
 
-                    case "Обустройство дома для взрослого питомца":
-                        getRecommendationsHomeImprovementForAdult(chatId);
-                        break;
+                case "Обустройство дома":
+                    getRecommendationsHomeImprovement(chatId);
+                    break;
 
-                    case "Обустройство дома для питомца с ограниченными возможностями":
-                        getRecommendationsHomeImprovementForDisabledPet(chatId);
-                        break;
+                case "Обустройство дома для взрослого питомца":
+                    getRecommendationsHomeImprovementForAdult(chatId);
+                    break;
 
-                    case "Вернуться":
-                        toReturn(chatId);
-                        break;
+                case "Обустройство дома для питомца с ограниченными возможностями":
+                    getRecommendationsHomeImprovementForDisabledPet(chatId);
+                    break;
 
-                    case "Советы кинолога":
-                        getAdviceFromDogHandler(chatId);
-                        break;
+                case "Вернуться":
+                    toReturn(chatId);
+                    break;
 
-                    case "Проверенные кинологи":
-                        getDogHandlerContacts(chatId);
-                        break;
+                case "Советы кинолога":
+                    getAdviceFromDogHandler(chatId);
+                    break;
 
-                    case "Причины отказа":
-                        getReasonsForRefusal(chatId);
-                        break;
+                case "Проверенные кинологи":
+                    getDogHandlerContacts(chatId);
+                    break;
 
-                    case "Позвать волонтера":
-                        callToVolunteer(chatId);
-                        break;
+                case "Причины отказа":
+                    getReasonsForRefusal(chatId);
+                    break;
 
-                    case "Прислать отчет о питомце":
-                        sendPetReport(chatId);
-                        break;
+                case "Позвать волонтера":
+                    callToVolunteer(chatId);
+                    break;
 
-                    case "Форма ежедневного отчета":
-                        sendDailyReportForm(chatId);
-                        break;
+                case "Прислать отчет о питомце":
+                    sendPetReport(chatId);
+                    break;
+
+                case "Форма ежедневного отчета":
+                    sendDailyReportForm(chatId);
+                    break;
 
 
-                    default:
-                        var count = incorrectCounts.getOrDefault(chatId, 0);
-                        if (count < 2) {
-                            incorrectCounts.put(chatId, count + 1);
-                            writeIncorrectText(chatId);
-                        } else {
-                            writeIncorrectText2(chatId);
-                        }
-                }
+                default:
+                    var count = incorrectCounts.getOrDefault(chatId, 0);
+                    if (count < 2) {
+                        incorrectCounts.put(chatId, count + 1);
+                        writeIncorrectText(chatId);
+                    } else {
+                        writeIncorrectText2(chatId);
+                    }
             }
         }
     }
+
 
 /*
     public void sendDocument(long chatId, File file) throws TelegramApiException {
@@ -366,9 +401,19 @@ public class TelegramBotUpdatesListener extends TelegramLongPollingBot {
         }
 
         // Отправьте сообщение в Telegram
-        sendMessage(chatId ,petsInfo.toString());
+        sendMessage(chatId, petsInfo.toString());
     }
 
+    // Метод для получения ссылки на картинку с максимальным разрешением
+//    private PhotoSize getLargestPhoto(List<PhotoSize> photos) {
+//        PhotoSize largest = null;
+//        for (PhotoSize photo : photos) {
+//            if (largest == null || photo.getFileSize() > largest.getFileSize()) {
+//                largest = photo;
+//            }
+//        }
+//        return largest;
+//    }
 
 
 //    public void getShowPets(long chatId) {
@@ -395,7 +440,7 @@ public class TelegramBotUpdatesListener extends TelegramLongPollingBot {
 
     //Кнопка 1.2.2: Правила знакомства и усыновления
     private void getRulesOfBehaviorAtShelter(long chatId) {
-        String text= "Вот Вам несколько ссылок для ознакомления. Здесь вы сможете найти необходимую для вас информацию:\n"
+        String text = "Вот Вам несколько ссылок для ознакомления. Здесь вы сможете найти необходимую для вас информацию:\n"
                 + "https://adme.media/articles/10-sovetov-kotorye-pomogut-podruzhitsya-s-neznakomoj-sobakoj-2509006/:\n" +
                 "https://www.mk.ru/social/2020/08/15/kak-vesti-sebya-s-zhivotnymi-iz-priyuta-pyat-osnovnykh-pravil.html";
         sendMessage2(chatId, text, menuBot.sendSubmenu2());
@@ -458,7 +503,7 @@ public class TelegramBotUpdatesListener extends TelegramLongPollingBot {
 
     //Кнока 1.2.6: Проверенные кинологи
     private void getDogHandlerContacts(long chatId) {
-        String text ="Мной дан список проверенных кинологов для общения с ними:\n" +
+        String text = "Мной дан список проверенных кинологов для общения с ними:\n" +
                 "1. Алексей, 43 года. Стаж: 20 лет. Контактные данные:+7-923-232-34-54. \n" +
                 "2. Георгий, 30 лет. Стаж: 7 лет. Контактные данные:+7-923-555-30-90. \n" +
                 "3. Юлия, 26 лет. Стаж: 3 года. Контактные данные:+7-923-987-78-79. \n";
@@ -511,7 +556,7 @@ public class TelegramBotUpdatesListener extends TelegramLongPollingBot {
         String text = "В ежедневный отчет входит следующая информация: \n" +
                 "\n" +
                 "- *Фото животного.*\n" +
-                "(Фотография и текст должны быть одним сообщением)"+
+                "(Фотография и текст должны быть одним сообщением)" +
                 "- *Рацион животного.*\n" +
                 "- *Общее самочувствие и привыкание к новому месту.*\n" +
                 "- *Изменения в поведении: отказ от старых привычек, приобретение новых.*\n" +
@@ -571,6 +616,48 @@ public class TelegramBotUpdatesListener extends TelegramLongPollingBot {
     }
 
 
+    // Скачивает файл с сервера Telegram
+//    private File downloadFile(String fileId) {
+//        try {
+//            // Получаем ссылку на файл
+//            String fileUrl = execute(new org.telegram.telegrambots.meta.api.methods.GetFile().setFileId(fileId)).getFileUrl();
+//            // Скачиваем файл
+//            InputStream is = new URL(fileUrl).openStream();
+//            File downloadedFile = new File("downloaded_" + fileId + ".jpg");
+//            OutputStream os = new FileOutputStream(downloadedFile);
+//            byte[] buffer = new byte[1024];
+//            int length;
+//            while ((length = is.read(buffer)) != -1) {
+//                os.write(buffer, 0, length);
+//            }
+//            is.close();
+//            os.close();
+//            return downloadedFile;
+//        } catch (IOException | TelegramApiException e) {
+//            e.printStackTrace();
+//            return null;
+//        }
+//    }
+    private void saveToDatabase(long chatId, String text, byte[] photo) throws IOException {
+        var report = new Report();
+        report.setChatId(chatId);
+        report.setWords(text);
+        report.setPhoto(photo);
+        reportRepository.save(report);
+        logger.info("сохранено", report);
+    }
+
+//        String URL = "jdbc:postgresql://localhost:5432/tg_animal";
+//        String USERNAME = "tg_animal";
+//        String PASSWORD = "tg_animal";
+//        try (Connection connection = DriverManager.getConnection(URL, USERNAME, PASSWORD);
+//             PreparedStatement statement = connection.prepareStatement("INSERT INTO message (text, photo_id) VALUES (?, ?)")) {
+//            statement.setString(1, text);
+//            statement.setString(2, photoId);
+//            statement.executeUpdate();
+//        } catch (SQLException e) {
+//            e.printStackTrace();
+//        }
 
 
 
