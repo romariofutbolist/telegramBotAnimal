@@ -5,6 +5,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
+import org.telegram.telegrambots.meta.api.methods.commands.DeleteMyCommands;
+import org.telegram.telegrambots.meta.generics.TelegramBot;
 
 @Configuration
 @Data
@@ -20,10 +22,6 @@ public class ConfigurationAnimal {
     @Value("{telegram.bot.volunteer}")
     private String volunteer;
 
-//    @Bean
-//    public PetService petService(){
-//    return new PetService();
-//    }
 
     public String getToken() {
         return token;

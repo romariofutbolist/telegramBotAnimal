@@ -2,7 +2,7 @@
 
 -- changeset roman:1
 
-CREATE TABLE users(
+create TABLE users(
     id BIGSERIAL PRIMARY KEY,
     chat_Id BIGINT,
     name TEXT,
@@ -13,7 +13,7 @@ CREATE TABLE users(
 
 -- changeset roman:2
 
-CREATE TABLE pets(
+create TABLE pets(
     id BIGSERIAL PRIMARY KEY,
     name TEXT,
     BREED TEXT,
@@ -24,11 +24,10 @@ CREATE TABLE pets(
 
     -- changeset roman:3
 
-CREATE TABLE pet_report(
+create TABLE pet_report(
     id BIGSERIAL PRIMARY KEY,
     animals_Diet TEXT,
     animal_Health TEXT,
     animal_Habits TEXT,
     data TIMESTAMP without time zone
 );
-
