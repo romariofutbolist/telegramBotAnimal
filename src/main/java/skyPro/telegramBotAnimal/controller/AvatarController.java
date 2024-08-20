@@ -29,9 +29,9 @@ public class AvatarController {
         this.avatarService = avatarService;
     }
 
-    @PostMapping(value = "/{id}/avatar", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<String> uploadAvatar(@PathVariable Long id, @RequestParam MultipartFile avatar) throws IOException {
-        avatarService.uploadAvatar(id, avatar);
+    @PostMapping(value = "/{petReportId}/avatar", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<String> uploadAvatar(@PathVariable Long petReportId, @RequestParam MultipartFile avatar) throws IOException {
+        avatarService.uploadAvatar(petReportId, avatar);
         return ResponseEntity.ok().build();
     }
 
@@ -50,6 +50,7 @@ public class AvatarController {
                 .headers(headers)
                 .body(avatar.getData());
     }
+
 
     @GetMapping(value = "/{id}/avatar")
     public void downloadAvatar(@PathVariable Long id, HttpServletResponse response) throws IOException {

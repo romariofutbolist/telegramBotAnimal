@@ -23,6 +23,10 @@ public class Sheduler {
         this.reportRepository = reportRepository;
     }
 
+    public void checkNotifications() {
+        reportRepository.findNotificationTasksByTaskDate(LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES))
+                .forEach(task ->
+                        telegramBot.execute);
 }
 
 
