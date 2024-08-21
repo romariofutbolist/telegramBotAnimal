@@ -1,5 +1,6 @@
 package skyPro.telegramBotAnimal.model;
 
+import org.telegram.telegrambots.meta.api.objects.InputFile;
 import org.telegram.telegrambots.meta.api.objects.PhotoSize;
 
 import javax.persistence.*;
@@ -17,19 +18,20 @@ public class Report {
     @Column(name = "text")
     private String text;
 
-    @Lob
     @Column(name = "photo")
-    private byte[] photo;
+    private InputFile photo;
 
+    private String fileName;
+    private String fileType;
 
+    public Report() {}
 
-    public Report() {
-    }
-
-    public Report(Long chatId, String text, byte[] photo) {
+    public Report(Long chatId, String text, InputFile photo, String fileName, String fileType) {
         this.chatId = chatId;
         this.text = text;
         this.photo = photo;
+        this.fileName = fileName;
+        this.fileType = fileType;
     }
 
     public Long getChatId() {
@@ -40,20 +42,36 @@ public class Report {
         this.chatId = chatId;
     }
 
-    public String getWords() {
+    public String getText() {
         return text;
     }
 
-    public void setWords(String text) {
+    public void setText(String text) {
         this.text = text;
     }
 
-    public byte[] getPhoto() {
+    public InputFile getPhoto() {
         return photo;
     }
 
-    public void setPhoto(byte[] photo) {
+    public void setPhoto(InputFile photo) {
         this.photo = photo;
+    }
+
+    public String getFileName() {
+        return fileName;
+    }
+
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
+    }
+
+    public String getFileType() {
+        return fileType;
+    }
+
+    public void setFileType(String fileType) {
+        this.fileType = fileType;
     }
 
     @Override
@@ -61,22 +79,22 @@ public class Report {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Report report = (Report) o;
-        return Objects.equals(chatId, report.chatId) && Objects.equals(text, report.text) && Arrays.equals(photo, report.photo);
+        return Objects.equals(chatId, report.chatId) && Objects.equals(text, report.text) && Objects.equals(photo, report.photo) && Objects.equals(fileName, report.fileName) && Objects.equals(fileType, report.fileType);
     }
 
     @Override
     public int hashCode() {
-        int result = Objects.hash(chatId, text);
-        result = 31 * result + Arrays.hashCode(photo);
-        return result;
+        return Objects.hash(chatId, text, photo, fileName, fileType);
     }
 
     @Override
     public String toString() {
         return "Report{" +
                 "chatId=" + chatId +
-                ", words='" + text + '\'' +
-                ", photo=" + Arrays.toString(photo) +
+                ", text='" + text + '\'' +
+                ", photo=" + photo +
+                ", fileName='" + fileName + '\'' +
+                ", fileType='" + fileType + '\'' +
                 '}';
     }
 }

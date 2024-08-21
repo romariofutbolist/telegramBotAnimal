@@ -6,7 +6,6 @@ import javax.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.TelegramBotsApi;
@@ -14,6 +13,7 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
 import org.telegram.telegrambots.meta.api.objects.InputFile;
 import org.telegram.telegrambots.meta.api.objects.Message;
+import org.telegram.telegrambots.meta.api.objects.PhotoSize;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboard;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
@@ -30,10 +30,7 @@ import skyPro.telegramBotAnimal.service.PetService;
 import skyPro.telegramBotAnimal.service.UserService;
 
 import java.io.*;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -57,10 +54,10 @@ public class TelegramBotUpdatesListener extends TelegramLongPollingBot {
     private final PetRepository petRepository;
     private final ReportRepository reportRepository;
     private final MenuBot menuBot;
-    private final Report report;
 
 
-    public TelegramBotUpdatesListener(PetService petService, ConfigurationAnimal animal, UserRepository repository, MenuBot menuBot, UserService userService, PetRepository petRepository, ReportRepository reportRepository, Report report) {
+
+    public TelegramBotUpdatesListener(PetService petService, ConfigurationAnimal animal, UserRepository repository, MenuBot menuBot, UserService userService, PetRepository petRepository, ReportRepository reportRepository) {
         this.petService = petService;
         this.animal = animal;
         this.repository = repository;
@@ -69,7 +66,6 @@ public class TelegramBotUpdatesListener extends TelegramLongPollingBot {
         this.petRepository = petRepository;
         this.reportRepository = reportRepository;
 
-        this.report = report;
     }
 
     @PostConstruct
@@ -85,18 +81,32 @@ public class TelegramBotUpdatesListener extends TelegramLongPollingBot {
         String text = update.getMessage().getText();
         long chatId = update.getMessage().getChatId();
         String login = update.getMessage().getFrom().getUserName();
+        List<PhotoSize> photo = update.getMessage().getPhoto();
         var state = userStates.get(chatId);
         var user = userService.findByUser(chatId);
 
         if (update.hasMessage() && update.getMessage().hasPhoto()) {
             Message message = update.getMessage();
-
-            // Сохранение в базу данных
+            PhotoSize photoSize = message.getPhoto().get(0);
+            InputFile inputFile = new InputFile(photoSize.getFileId());
+            String fileName = photoSize.getFileName(); // Почему `getFileName()` недоступен
+            String fileType = photoSize.getFileType(); // Почему`getFileType()` недоступен
             try {
-                saveToDatabase(chatId, text, report.getPhoto());
-            } catch (IOException e) {
+                // Загружаем фото в Telegram, получаем ссылку
+                String photoUrl = execute(new SendPhoto().setChatId(chatId).setPhoto(inputFile)).getPhoto().get(0).getFileId(); //SetPhoto красным
+                // Сохраняем ссылку в базу данных
+                saveToDatabase(chatId, text, photoUrl, inputFile, fileName, fileType );
+            } catch (TelegramApiException e) {
                 throw new RuntimeException(e);
             }
+
+
+            // Сохранение в базу данных
+//            try {
+//                saveToDatabase(chatId, text, report.getPhoto());
+//            } catch (IOException e) {
+//                throw new RuntimeException(e);
+//            }
 
 
 //            PhotoSize largestPhoto = getLargestPhoto(update.getMessage().getPhoto());
@@ -638,14 +648,20 @@ public class TelegramBotUpdatesListener extends TelegramLongPollingBot {
 //            return null;
 //        }
 //    }
-    private void saveToDatabase(long chatId, String text, byte[] photo) throws IOException {
-        var report = new Report();
+    private void saveToDatabase(long chatId, String text, String photoUrl, InputFile inputFile, String fileName, String fileType ) throws IOException{        var report = new Report();
+        report.setPhoto(photoUrl); //photoUrl красным
         report.setChatId(chatId);
-        report.setWords(text);
-        report.setPhoto(photo);
+        report.setText(text);
+        // Генерация уникального имени файла
+        String fileName = UUID.randomUUID().toString() + "." + fileType; //fileName красным
+        report.setFileName(fileName);
+        report.setFileType(fileType);
+
+        report.setPhoto(inputFile); // Установите значение поля photo
         reportRepository.save(report);
         logger.info("сохранено", report);
     }
+
 
 //        String URL = "jdbc:postgresql://localhost:5432/tg_animal";
 //        String USERNAME = "tg_animal";
