@@ -36,7 +36,8 @@ CREATE TABLE user_pet (
 );
 
 -- changeset annaa:4
-CREATE TABLE report(
+CREATE TABLE photo(
+    id BIGSERIAL,
     chat_Id BIGINT,
     text TEXT,
     photo BYTEA
