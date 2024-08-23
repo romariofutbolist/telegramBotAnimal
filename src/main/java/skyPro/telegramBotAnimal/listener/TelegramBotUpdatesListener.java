@@ -3,33 +3,35 @@ package skyPro.telegramBotAnimal.listener;
 
 import javax.annotation.PostConstruct;
 
-import liquibase.pro.packaged.S;
+import org.apache.commons.io.IOUtils;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.TelegramBotsApi;
-import org.telegram.telegrambots.meta.api.methods.send.SendDocument;
+import org.telegram.telegrambots.meta.api.methods.GetFile;
+import org.telegram.telegrambots.meta.api.objects.File;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
-import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
-import org.telegram.telegrambots.meta.api.objects.InputFile;
+import org.telegram.telegrambots.meta.api.objects.PhotoSize;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboard;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
 import skyPro.telegramBotAnimal.configuration.ConfigurationAnimal;
 import skyPro.telegramBotAnimal.model.MenuBot;
+import skyPro.telegramBotAnimal.model.Photo;
 import skyPro.telegramBotAnimal.model.User;
 import skyPro.telegramBotAnimal.model.Pet;
+import skyPro.telegramBotAnimal.repository.PhotoRepository;
 import skyPro.telegramBotAnimal.repository.UserRepository;
 import skyPro.telegramBotAnimal.service.PetService;
 import skyPro.telegramBotAnimal.service.UserService;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
+import java.net.URL;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -53,14 +55,16 @@ public class TelegramBotUpdatesListener extends TelegramLongPollingBot {
 //    private final Pet pet;
 
     private final UserRepository repository;
+    private final PhotoRepository repository1;
     private final MenuBot menuBot;
 
 
-    public TelegramBotUpdatesListener(ConfigurationAnimal animal, UserRepository repository, MenuBot menuBot, UserService userService) {
+    public TelegramBotUpdatesListener(ConfigurationAnimal animal, UserRepository repository, MenuBot menuBot, UserService userService, PhotoRepository repository1) {
         this.animal = animal;
         this.repository = repository;
         this.menuBot = menuBot;
         this.userService = userService;
+        this.repository1 = repository1;
     }
 
     @PostConstruct
@@ -78,6 +82,7 @@ public class TelegramBotUpdatesListener extends TelegramLongPollingBot {
             String login = update.getMessage().getFrom().getUserName();
             var state = userStates.get(chatId);
             var user = userService.findByUser(chatId);
+            List<PhotoSize> photo = update.getMessage().getPhoto();
 
             if ("PhoneListener".equals(state)) {
                 handleContactInput(chatId, text);
@@ -102,9 +107,9 @@ public class TelegramBotUpdatesListener extends TelegramLongPollingBot {
                         getAdressOfShelter(chatId);
                         break;
 
-                    case "Оформление пропуска и схема проезда":
-                        IssuePassAndGetDrivingDirections(chatId);
-                        break;
+//                    case "Оформление пропуска и схема проезда":
+//                        IssuePassAndGetDrivingDirections(chatId);
+//                        break;
 
                     case "Техника безопасности":
                         getSafetyEquipment(chatId);
@@ -177,7 +182,16 @@ public class TelegramBotUpdatesListener extends TelegramLongPollingBot {
                     case "Прислать отчет о питомце":
                         sendPetReport(chatId);
                         break;
+                    case "Отчет":
+                        try {
+                            downloadPhoto(photo);
+                        } catch (TelegramApiException e) {
+                            throw new RuntimeException(e);
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
 
+                        break;
                     case "Форма ежедневного отчета":
                         sendDailyReportForm(chatId);
                         break;
@@ -281,30 +295,30 @@ public class TelegramBotUpdatesListener extends TelegramLongPollingBot {
     }
 
     //Кнопка 1.1.2: Оформление пропуска и схема проезда
-    private void IssuePassAndGetDrivingDirections(long chatId) {
-        String text = "Для оформления пропуска необходимо при себе иметь паспорт.\n" +
-                "После оформления пропуска Вам необходимо пройти в здание 16Д: Схема проезда указана на фото";
-        sendMessage2(chatId, text, menuBot.sendSubmenu1());
-        sendPhoto(chatId);
-    }
+//    private void IssuePassAndGetDrivingDirections(long chatId) {
+//        String text = "Для оформления пропуска необходимо при себе иметь паспорт.\n" +
+//                "После оформления пропуска Вам необходимо пройти в здание 16Д: Схема проезда указана на фото";
+//        sendMessage2(chatId, text, menuBot.sendSubmenu1());
+//        sendPhoto(chatId);
+//    }
 
     //Метод, позволяющий отправить пользователю картинку - схема проезда
     //    C:/Users/Анна/IdeaProjects/telegramBotAnimal/target/classes/static/123.jpg
     //    /home/roma/telegramBotAnimal/target/classes/static/123.jpg
     //    /Users/denis/IdeaProjects/telegramBotAnimal/src/main/resources/123.jpg
-    public void sendPhoto(long chatId) {
-        String imagePath = "/home/roma/telegramBotAnimal/target/classes/static/123.jpg";
-        File imageFile = new File(imagePath);
-        InputFile photo = new InputFile(imageFile);
-        SendPhoto sendPhoto = new SendPhoto();
-        sendPhoto.setChatId(chatId);
-        sendPhoto.setPhoto(photo);
-        try {
-            execute(sendPhoto);
-        } catch (TelegramApiException e) {
-            throw new RuntimeException("ошибка");
-        }
-    }
+//    public void sendPhoto(long chatId) {
+//        String imagePath = "/home/roma/telegramBotAnimal/target/classes/static/123.jpg";
+//        File imageFile = new File(imagePath);
+//        InputFile photo = new InputFile(imageFile);
+//        SendPhoto sendPhoto = new SendPhoto();
+//        sendPhoto.setChatId(chatId);
+//        sendPhoto.setPhoto(photo);
+//        try {
+//            execute(sendPhoto);
+//        } catch (TelegramApiException e) {
+//            throw new RuntimeException("ошибка");
+//        }
+//    }
 
     //Кнопка 1.1.3: Техника безопасности
     private void getSafetyEquipment(long chatId) {
@@ -481,6 +495,62 @@ public class TelegramBotUpdatesListener extends TelegramLongPollingBot {
                 "В данном разделе ты можешь получить образец формы ежедневного отчета, на основании, которого ты можешь нас оповещать о состоянии питомца";
         sendMessage2(chatId, text, menuBot.sendSubmenu4());
     }
+//    private void downloadPhoto( List<PhotoSize> photos) throws TelegramApiException, IOException {
+//        PhotoSize photo = photos.stream().max(Comparator.comparing(PhotoSize::getFileSize)).orElse(null);
+//        GetFile getFile = new GetFile();
+//        getFile.setFileId(photo.getFileId());
+//        File file = execute(getFile);
+//        String fileUrl = "https://api.telegram.org/file/bot" + getBotToken() + "/" + file.getFilePath();
+//
+//        InputStream in = new BufferedInputStream(new URL(fileUrl).openStream());
+//        String filePath = "./avatars/" + file.getFilePath();
+//        java.io.File outFile = new java.io.File(filePath);
+//        outFile.getParentFile().mkdirs();
+//        try (FileOutputStream out = new FileOutputStream(outFile)) {
+//            byte[] dataBuffer = new byte[1024];
+//            int bytesRead;
+//            while ((bytesRead = in.read(dataBuffer, 0, 1024)) != -1) {
+//                out.write(dataBuffer, 0, bytesRead);
+//                    var petPhoto = new Photo();
+//                    petPhoto.setFilePath(filePath);
+//                    petPhoto.setFileSize(outFile.length());
+//                    petPhoto.setImage(IOUtils.toByteArray(outFile.toURI()));
+//                    repository1.save(petPhoto);
+//                }
+//            }
+//
+//    }
+private void downloadPhoto( List<PhotoSize> photos) throws TelegramApiException, IOException {
+    PhotoSize photo = photos.stream().max(Comparator.comparing(PhotoSize::getFileSize)).orElse(null);
+
+    if (photo != null) {
+        GetFile getFile = new GetFile();
+        getFile.setFileId(photo.getFileId());
+        File file = execute(getFile);
+        String fileUrl = "https://api.telegram.org/file/bot" + getBotToken() + "/" + file.getFilePath();
+
+        InputStream in = new BufferedInputStream(new URL(fileUrl).openStream());
+        String filePath = "./avatars/" + file.getFilePath();
+        java.io.File outFile = new java.io.File(filePath);
+        outFile.getParentFile().mkdirs();
+
+        try (FileOutputStream out = new FileOutputStream(outFile)) {
+            byte[] dataBuffer = new byte[1024];
+            int bytesRead;
+            while ((bytesRead = in.read(dataBuffer, 0, 1024)) != -1) {
+                out.write(dataBuffer, 0, bytesRead);
+            }
+        }
+        var petPhoto = new Photo();
+        petPhoto.setFilePath(filePath);
+        petPhoto.setFileSize(outFile.length());
+        petPhoto.setImage(IOUtils.toByteArray(in));
+        repository1.save(petPhoto);
+    } else {
+
+        System.err.println("Фотография не найдена.");
+    }
+}
 
     //Кнопка 1.3.1: Форма ежедневного отчета
     private void sendDailyReportForm(long chatId) {
