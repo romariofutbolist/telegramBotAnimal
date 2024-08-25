@@ -10,5 +10,8 @@ import java.util.List;
 @Repository
 public interface ReportRepository extends JpaRepository<PetReport, Long> {
     //void findNotificationTasksByTaskDate(LocalDateTime localDateTime);
-    List<PetReport> findNotificationTasksByTaskDate(LocalDateTime time);
+    //List<PetReport> findNotificationTasks(LocalDateTime time);
+
+    //List<PetReport> get(long id);
+    //List<PetReport> getAll();
 }

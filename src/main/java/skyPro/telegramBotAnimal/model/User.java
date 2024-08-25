@@ -67,8 +67,6 @@ public class User {
         this.login = login;
     }
 
-
-
     public Pet getPet() {
         return pet;
     }

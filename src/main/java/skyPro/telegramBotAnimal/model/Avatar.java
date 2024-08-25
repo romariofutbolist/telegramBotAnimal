@@ -13,8 +13,6 @@ public class Avatar {
     private String filePath;
     private long fileSize;
     private String mediaType;
-
-    @Column(columnDefinition = "oid")
     private byte[] data;
 
     @OneToOne

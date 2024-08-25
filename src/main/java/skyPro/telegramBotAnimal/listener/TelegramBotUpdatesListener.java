@@ -541,7 +541,8 @@ public class TelegramBotUpdatesListener extends TelegramLongPollingBot {
 
     //Метод, помогающий передать необходимому волонтеру новое обращение
     private void sendToVolunteer(String chatId, String text) {
-        final String ADMIN_ID = String.valueOf(934262991);
+        //final String ADMIN_ID = String.valueOf(934262991);
+        final String ADMIN_ID = String.valueOf(1063364663);
         try {
             execute(new SendMessage(ADMIN_ID, "Новое обращение от @" + chatId + ": " + text));
         } catch (TelegramApiException e) {

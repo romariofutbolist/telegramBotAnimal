@@ -19,6 +19,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Objects;
+import java.util.UUID;
 
 import static java.nio.file.StandardOpenOption.CREATE_NEW;
 
@@ -41,7 +42,7 @@ public class AvatarService {
     public void uploadAvatar(Long petReportId, MultipartFile avatarFile) throws IOException {
         logger.info("Upload avatar was invoked!");
         PetReport petReport = reportRepository.getById(petReportId);
-        Path filePath = Path.of(avatarsDir, petReport + "." + getExtensions(Objects.requireNonNull(avatarFile.getOriginalFilename())));
+        Path filePath = Path.of(avatarsDir, UUID.randomUUID().toString() + "." + getExtensions(avatarFile.getOriginalFilename()));
         Files.createDirectories(filePath.getParent());
         Files.deleteIfExists(filePath);
         try (
@@ -86,7 +87,7 @@ public class AvatarService {
 
 
     public Avatar findAvatar(Long petReportId) {
-        return avatarRepository.findById(petReportId).orElse(null);
+        return avatarRepository.findById(petReportId).orElse(new Avatar());
     }
 
 
