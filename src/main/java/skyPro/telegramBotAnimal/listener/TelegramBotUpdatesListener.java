@@ -25,10 +25,11 @@ import skyPro.telegramBotAnimal.model.User;
 import skyPro.telegramBotAnimal.model.Pet;
 import skyPro.telegramBotAnimal.repository.PetRepository;
 import skyPro.telegramBotAnimal.repository.PhotoRepository;
-//import skyPro.telegramBotAnimal.repository.ReportRepository;
+
 import skyPro.telegramBotAnimal.repository.UserRepository;
 import skyPro.telegramBotAnimal.service.PetService;
 import skyPro.telegramBotAnimal.service.UserService;
+
 
 import java.io.File;
 import java.io.FileOutputStream;

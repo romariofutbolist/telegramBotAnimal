@@ -8,7 +8,6 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.generics.TelegramBot;
 import skyPro.telegramBotAnimal.model.Photo;
 import skyPro.telegramBotAnimal.repository.PhotoRepository;
-import skyPro.telegramBotAnimal.service.TelegramBotService;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
@@ -17,34 +16,28 @@ import java.util.List;
 @Service
 public class CheckReport {
     private static final Logger log = LoggerFactory.getLogger(CheckReport.class);
-    private final TelegramBotService telegramBotService;
+    private final TelegramBot telegramBot;
     private final PhotoRepository photoRepository;
 
-    public CheckReport(TelegramBotService telegramBotService, PhotoRepository photoRepository) {
-        this.telegramBotService = telegramBotService;
-
+    public CheckReport(TelegramBot telegramBot, PhotoRepository photoRepository) {
+        this.telegramBot = telegramBot;
         this.photoRepository = photoRepository;
     }
 
-    //@Scheduled(cron = "0 0 21   ")
-    @Scheduled(cron = "0 0/1 * * * *")
+    @Scheduled(cron = "0 0 21   ") // проверка в 9 вечера
     public void checkReport() {
-        try {
-            log.info("Проверка отчетов началась.");
-            LocalDateTime today = LocalDateTime.now().truncatedTo(ChronoUnit.DAYS);
-            List<Photo> photos = photoRepository.findPhotoByDate(today);
-            log.info("Найдено {} фотографий.", ((List<?>) photos).size());
+        photoRepository.findPhotoByDate(LocalDateTime.now().truncatedTo(ChronoUnit.DAYS))
+                .forEach(photo -> {
+                    telegramBot.execute(new SendMessage(photo.getChatId(), "Отчет не был получен"));
+                    log.info("Message has been sent");
+                });
 
-            for (Photo photo : photos) {
-                if (photo.getText() == null || photo.getFileId() == null) {
-                    log.info("Отчет за {} отсутствует, отправляем сообщение.", today);
-                    telegramBotService.execute(new SendMessage(String.valueOf(photo.getChatId()), "В настоящий момент отчет за сегодняшний день не получен"));
-                } else {
-                    log.info("Отчет за {} найден.", today);
-                }
-            }
-        } catch (Exception e) {
-            log.error("Произошла ошибка при проверке отчетов.", e);
-        }
+
+        LocalDateTime today = LocalDateTime.now().truncatedTo(ChronoUnit.DAYS)
+
+        List<Photo> photos = photoRepository.findPhotoByDate(today);
+
     }
 }
+
+
