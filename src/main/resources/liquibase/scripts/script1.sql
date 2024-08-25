@@ -38,6 +38,7 @@ CREATE TABLE user_pet (
 -- changeset annaa:4
 CREATE TABLE photo(
     id BIGSERIAL,
+    sent_time DATE,
     chat_Id BIGINT,
     text TEXT,
     photo BYTEA

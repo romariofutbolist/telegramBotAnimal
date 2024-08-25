@@ -33,10 +33,7 @@ import skyPro.telegramBotAnimal.service.UserService;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -54,7 +51,7 @@ public class TelegramBotUpdatesListener extends TelegramLongPollingBot {
 
     private final UserRepository repository;
     private final PetRepository petRepository;
-   // private final ReportRepository reportRepository;
+    // private final ReportRepository reportRepository;
     private final PhotoRepository photoRepository;
     private final MenuBot menuBot;
 
@@ -65,7 +62,7 @@ public class TelegramBotUpdatesListener extends TelegramLongPollingBot {
         this.menuBot = menuBot;
         this.userService = userService;
         this.petRepository = petRepository;
-    //    this.reportRepository = reportRepository;
+        //    this.reportRepository = reportRepository;
         this.photoRepository = photoRepository;
     }
 
@@ -97,7 +94,6 @@ public class TelegramBotUpdatesListener extends TelegramLongPollingBot {
             GetFile getFile = new GetFile();
             getFile.setFileId(fileId);
 
-            // тут что-то с подписью
 
 
             // Сохраняем фото в базу данных
@@ -109,14 +105,12 @@ public class TelegramBotUpdatesListener extends TelegramLongPollingBot {
             photoEntity.setChatId(chatId); // Сохр. чат ID пользователя
             photoEntity.setLogin(login); // Сохр. логин пользователя
 
+            // Сохранение времени отправки
+            photoEntity.setSentTime(new Date()); // Используем объект Date для хранения времени
             // Сохранение фото в базе данных
 
             photoRepository.save(photoEntity);
             sendMessage(chatId, "Отчет сохранен.");
-
-
-
-
 
 
 //            try (FileOutputStream outputStream = new FileOutputStream(filePathPet)) {
@@ -127,7 +121,7 @@ public class TelegramBotUpdatesListener extends TelegramLongPollingBot {
 //            }
 
 
-        }else if (update.hasMessage() && update.getMessage().hasText()) {
+        } else if (update.hasMessage() && update.getMessage().hasText()) {
 //            String text = update.getMessage().getText();
 //            long chatId = update.getMessage().getChatId();
 //            String login = update.getMessage().getFrom().getUserName();

@@ -1,6 +1,7 @@
 package skyPro.telegramBotAnimal.model;
 
 import javax.persistence.*;
+import java.util.Date;
 
 @Entity
 @Table(name = "photo")
@@ -9,6 +10,8 @@ public class Photo {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id; // ID записи в базе данных
+    @Column(name = "DATE")
+    public Date sentTime;
     private String fileId;
     private Long chatId;
     private String login;
@@ -55,4 +58,16 @@ public class Photo {
     public void setText(String text) {
         this.text = text;
     }
+
+    public Date getSentTime() {
+        return sentTime;
+    }
+
+    public void setSentTime(Date sentTime) {
+        this.sentTime = sentTime;
+    }
+//
+//    public void execute(SendMessage sendMessage) {
+//
+//    }
 }
