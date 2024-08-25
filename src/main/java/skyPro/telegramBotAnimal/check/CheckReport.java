@@ -32,11 +32,6 @@ public class CheckReport {
                     log.info("Message has been sent");
                 });
 
-
-        LocalDateTime today = LocalDateTime.now().truncatedTo(ChronoUnit.DAYS)
-
-        List<Photo> photos = photoRepository.findPhotoByDate(today);
-
     }
 }
 
