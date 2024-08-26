@@ -2,14 +2,22 @@ package skyPro.telegramBotAnimal.listener;
 
 import javax.annotation.PostConstruct;
 
+import org.telegram.telegrambots.bots.TelegramLongPollingBot;
+
+import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
+
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.TelegramBotsApi;
 import org.telegram.telegrambots.meta.api.methods.GetFile;
-import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+
 import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
 import org.telegram.telegrambots.meta.api.objects.InputFile;
 import org.telegram.telegrambots.meta.api.objects.Message;
@@ -34,6 +42,9 @@ import skyPro.telegramBotAnimal.service.UserService;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -45,6 +56,7 @@ public class TelegramBotUpdatesListener extends TelegramLongPollingBot {
     private static final Pattern PHONE_PATTERN = Pattern.compile("\\+7-9\\d{2}-\\d{3}-\\d{2}-\\d{2}");
     @Autowired
     private PetService petService;
+    //    private TelegramBot telegramBot;
     private UserService userService;
     private static final Logger logger = LoggerFactory.getLogger(TelegramBotUpdatesListener.class);
     private final ConfigurationAnimal animal;
@@ -94,7 +106,6 @@ public class TelegramBotUpdatesListener extends TelegramLongPollingBot {
             // Загружаем файл фото с сервера Telegram
             GetFile getFile = new GetFile();
             getFile.setFileId(fileId);
-
 
 
             // Сохраняем фото в базу данных
@@ -585,6 +596,54 @@ public class TelegramBotUpdatesListener extends TelegramLongPollingBot {
                 "и предоставлю контактные данные кинологов для получения советов по общению с питомцем";
         sendMessage2(chatId, text, menuBot.sendSubmenu2());
     }
+
+    //    @Bean
+//    public TelegramBot telegramBot() {
+//        TelegramBot bot = new TelegramBot(animal.getToken());
+//        bot.execute(new DeleteMyCommands());
+//        return bot;
+//    }
+    @Scheduled(cron = "0 0/1 * * * * ") // проверка в 9 вечера
+    public void checkReport() {
+        List<Photo> photoList = photoRepository.findPhotoByDate();
+        if (photoList != null) {
+            photoList.forEach(photo -> {
+                // Получение chatId из объекта Photo
+                Long chatId = photo.getChatId();
+
+                // Проверка, есть ли уже фотография с таким же chatId в photoList1
+                if (chatId != null && !photoRepository.findPhotoToday().stream()
+                        .anyMatch(p -> p.getChatId().equals(chatId))) {
+                    String text1 = "Нужно прислать отчет";
+                    try {
+                        execute(new SendMessage(String.valueOf(chatId), text1));
+                        logger.info("Напоминание об отправке отчетов направлено");
+                    } catch (TelegramApiException e) {
+                        throw new RuntimeException(e);
+                    }
+                } else {
+                    logger.info("Все отчеты получены или уже отправлено напоминание");
+                }
+            });
+        }
+    }
+
+//    @Scheduled(cron = "0 0 21   ") // проверка в 9 вечера
+//    public void checkReport() {
+//        List<Photo> photoList = photoRepository.findPhotoByDate();
+//        if (photoList != null) {
+//            photoList.forEach(photo -> {
+//                // Получение chatId из объекта Photo
+//                Long chatId = photo.getChatId();
+//                if (chatId != null) {
+//                    String text = "Нужно прислать отчет";
+//                    photo.execute(new SendMessage(String.valueOf(chatId), text));
+//                } else {
+//                    // Обработка случая, когда chatId == null
+//                }
+//            });
+//        }
+//    }
 
 
     @Override

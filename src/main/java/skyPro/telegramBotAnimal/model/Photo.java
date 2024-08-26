@@ -1,5 +1,7 @@
 package skyPro.telegramBotAnimal.model;
 
+import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+
 import javax.persistence.*;
 import java.util.Date;
 
@@ -10,7 +12,7 @@ public class Photo {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id; // ID записи в базе данных
-    @Column(name = "DATE")
+    @Column(name = "sent_time")
     public Date sentTime;
     private String fileId;
     private Long chatId;
@@ -65,6 +67,11 @@ public class Photo {
 
     public void setSentTime(Date sentTime) {
         this.sentTime = sentTime;
+    }
+
+
+
+    public void execute(SendMessage sendMessage) {
     }
 //
 //    public void execute(SendMessage sendMessage) {
